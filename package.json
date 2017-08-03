@@ -19,5 +19,9 @@
   "bugs": {
     "url": "https://github.com/Leorek/Shadow-Discord/issues"
   },
-  "homepage": "https://github.com/Leorek/Shadow-Discord#readme"
+  "homepage": "https://github.com/Leorek/Shadow-Discord#readme",
+  "dependencies": {
+    "nodemw": "^0.10.1",
+    "wtf_wikipedia": "^1.0.1"
+  }
 }
