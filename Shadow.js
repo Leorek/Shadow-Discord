@@ -21,6 +21,10 @@ var iclient = new mwbot({
     debug: false                 // is more verbose when set to true
 });
 
+client.on('ready', () => {
+  client.user.setGame('leorek.gitlab.io');
+})
+
 
 client.on('message', msg => {
 

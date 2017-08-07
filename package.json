@@ -21,6 +21,7 @@
   },
   "homepage": "https://github.com/Leorek/Shadow-Discord#readme",
   "dependencies": {
+    "discord.js": "^11.1.0",
     "nodemw": "^0.10.1",
     "wtf_wikipedia": "^1.0.1"
   }
