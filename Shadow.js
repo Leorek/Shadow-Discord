@@ -4,6 +4,7 @@ var Config = require('./config.json');
 
 // Command objects
 var fs = require('fs');
+var yt = require('ytdl-core');
 
 // Media wiki
 var wtf_wikipedia = require("wtf_wikipedia")
@@ -24,6 +25,11 @@ var iclient = new mwbot({
 client.on('ready', () => {
   client.user.setGame('leorek.gitlab.io');
 })
+
+// Music variables
+
+var voice_connection = null;
+var voice_handler = null;
 
 
 client.on('message', msg => {
@@ -152,7 +158,8 @@ client.on('message', msg => {
           msg.member.voiceChannel.join()
             .then(connection => {
               msg.reply('I have successfully connected to the channel!');
-              var dispatcher = connection.playFile("test.mp3");
+              voice_connection = connection;
+              voice_handler = voice_connection.playStream(yt("https://www.youtube.com/watch?v=I8y99z5EVtY",{filter: 'audioonly'}));
             })
             .catch(console.log);
         } else {
