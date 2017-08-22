@@ -1,4 +1,5 @@
 // Media wiki
+var Commands = [];
 var wtf_wikipedia = require("wtf_wikipedia")
 var mwbot = require('nodemw');
 var mwclient = new mwbot({
@@ -14,11 +15,11 @@ var iclient = new mwbot({
     debug: false                 // is more verbose when set to true
 });
 
-    if(msg.content.startsWith(prefix + 'wiki')){
-        console.log(msg.author.username + ' used \'wiki\'')
-
-        var suffix = match[1];
-        console.log("------------- STARTING QUERY -------------")
+Commands.wiki = {
+  name: 'wiki',
+  help: "Searchs on wikipedia!.",
+  fn: function (msg, suffix) {
+    console.log("------------- STARTING QUERY -------------")
         mwclient.getArticle(suffix, undefined, function(err , info, next){
             if(err != null){
                 console.log('There was an error --> ' + err);
@@ -30,5 +31,9 @@ var iclient = new mwbot({
                 }
             }
         })
-        console.log("------------- FINISHING QUERY -------------");
-    }
+    console.log("------------- FINISHING QUERY -------------");
+  }
+}
+
+
+exports.Commands = Commands

@@ -1,4 +1,5 @@
 var ytdl = require('ytdl-core');
+var Request = require('request');
 var Config = require('../../config.json');
 var voice_connection = null;
 var voice_handler = null;
@@ -7,46 +8,7 @@ var queue = [];
 var now_playing_data = {};
 var inform_np = true;
 var paused = false;
-
-Commands.join = {
-  name: 'join',
-  help: "Makes Shadow to join a voice channel.",
-  fn: function (msg, suffix) {
-    if (!msg.guild) return;
-    text_channel = msg.guild.channels.find(chn => chn.name === 'pruebas-sity' && chn.type === "text");
-    if(text_channel === null) throw "Couldn't find text channel '#" + 'pruebas-sity' + "' in server '" + server_name + "'";
-    if (msg.member.voiceChannel) {
-      msg.member.voiceChannel.join()
-        .then(connection => {
-          msg.reply('I have successfully connected to the channel!');
-          voice_connection = connection;
-        })
-        .catch(console.log);
-    } else {
-      msg.reply('You need to join a voice channel first!');
-    }
-  }
-}
-
-Commands.join = {
-  name: 'join',
-  help: "Makes Shadow to join a voice channel.",
-  fn: function (msg, suffix) {
-    if (!msg.guild) return;
-    text_channel = msg.guild.channels.find(chn => chn.name === 'pruebas-sity' && chn.type === "text");
-    if(text_channel === null) throw "Couldn't find text channel '#" + 'pruebas-sity' + "' in server '" + server_name + "'";
-    if (msg.member.voiceChannel) {
-      msg.member.voiceChannel.join()
-        .then(connection => {
-          msg.reply('I have successfully connected to the channel!');
-          voice_connection = connection;
-        })
-        .catch(console.log);
-    } else {
-      msg.reply('You need to join a voice channel first!');
-    }
-  }
-}
+var Commands = [];
 
 Commands.join = {
   name: 'join',
@@ -85,7 +47,7 @@ Commands.search = {
   name: 'search',
   help: "Searchs a song on youtube and adds it to the queue.",
   fn: function (msg, suffix) {
-    search_video(msg,suffix);
+    search_video(msg, suffix);
   }
 }
 
@@ -202,3 +164,6 @@ function is_bot_playing() {
 function is_queue_empty() {
   return queue.length === 0;
 }
+
+
+exports.Commands = Commands

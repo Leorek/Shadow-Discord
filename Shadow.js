@@ -8,11 +8,15 @@ var Logger = Bunyan.createLogger(
       {
         level: 'info',
         path: './shadow.log'
+      },
+      {
+        level: 'error',
+        path: './shadow.log'
       }
     ]
   });
 var Config = require('./config.json');
-var commands = require('./Core/CommandCenter.js').Commands;
+var CommandCenter = require('./Core/CommandCenter.js');
 
 let prefix = "!";
 
@@ -29,18 +33,24 @@ Client.on('message', msg => {
   var command = getCommand(msg.content);
   var suffix = getSuffix(msg.content);
 
-  if (commands[command]) {
-      if (typeof commands[command] !== 'object') {
+  if (CommandCenter.Commands[command]) {
+      if (typeof CommandCenter.Commands[command] !== 'object') {
         return // ignore JS build-in array functions
       }
 
       Logger.info('Executing %s from %s', command, msg.author.username);
+      console.log("Executing " + command);
       
-      try {
-        commands[command].fn(msg,suffix);
-      } catch (e) {
+
+        try {
+          CommandCenter.Commands[command].fn(msg,suffix);
+        } catch (e) {
           msg.channel.send('An error ocurred processing this command.');
-      }
+          Logger.error(e);
+        }
+      }else if(command === 'help'){
+        console.log("Executing help");
+        CommandCenter.helpHandle(msg,suffix);
     }
 });
 
