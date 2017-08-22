@@ -39,8 +39,6 @@ Client.on('message', msg => {
       }
 
       Logger.info('Executing %s from %s', command, msg.author.username);
-      console.log("Executing " + command);
-      
 
         try {
           CommandCenter.Commands[command].fn(msg,suffix);
@@ -49,7 +47,7 @@ Client.on('message', msg => {
           Logger.error(e);
         }
       }else if(command === 'help'){
-        console.log("Executing help");
+        Logger.info('Executing %s from %s', command, msg.author.username);
         CommandCenter.helpHandle(msg,suffix);
     }
 });

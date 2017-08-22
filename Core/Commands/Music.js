@@ -15,8 +15,8 @@ Commands.join = {
   help: "Makes Shadow to join a voice channel.",
   fn: function (msg, suffix) {
     if (!msg.guild) return;
-    text_channel = msg.guild.channels.find(chn => chn.name === 'pruebas-sity' && chn.type === "text");
-    if(text_channel === null) throw "Couldn't find text channel '#" + 'pruebas-sity' + "' in server '" + server_name + "'";
+    text_channel = msg.guild.channels.find(chn => chn.name === 'general' && chn.type === "text");
+    if(text_channel === null) throw "Couldn't find text channel '#" + 'general' + "' in server '" + server_name + "'";
     if (msg.member.voiceChannel) {
       msg.member.voiceChannel.join()
         .then(connection => {
@@ -48,6 +48,20 @@ Commands.search = {
   help: "Searchs a song on youtube and adds it to the queue.",
   fn: function (msg, suffix) {
     search_video(msg, suffix);
+  }
+}
+
+Commands.volume = {
+  name: 'volume',
+  help: "Sets volume or returns actual one if no suffix specified.",
+  fn: function (msg, suffix, bot) {
+    if(Number.isInteger(suffix)){
+      DEFAULT_VOLUME = suffix;
+      if(voice_handler !== undefined){
+        voice_handler.setVolume(DEFAULT_VOLUME/100);
+      }
+    }
+    msg.reply("Volume: " + DEFAULT_VOLUME + "%");
   }
 }
 

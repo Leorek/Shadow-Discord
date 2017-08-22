@@ -32,15 +32,15 @@ exports.helpHandle = function (msg, suffix) {
     ]
     msg.author.createDM().then((y) => {
       if (!msg.isPrivate) {
-        msg.channel.sendMessage('Help is underway ' + msg.author.username + '!')
+        msg.channel.send('Help is underway ' + msg.author.username + '!')
       }
       for (var r in sorts) {
-        y.sendMessage(`\`\`\`ini\n${sorts[r].sort().join('\n')}\n\`\`\``) // FIXME: The entire commands array should sort instead of the sorts one
+        y.send(`\`\`\`ini\n${sorts[r].sort().join('\n')}\n\`\`\``) // FIXME: The entire commands array should sort instead of the sorts one
       }
-      y.sendMessage(misc.join('\n'))
+      y.send(misc.join('\n'))
     }).catch((e) => {
       //Logger.error(e)
-      msg.channel.sendMessage('Well, this is awkward, something went wrong while trying to PM you. Do you have them enabled on this server?')
+      msg.channel.send('Well, this is awkward, something went wrong while trying to PM you. Do you have them enabled on this server?')
     })
   } else if (suffix) {
     if (FunctionalCommands[suffix]) {
@@ -85,10 +85,10 @@ exports.helpHandle = function (msg, suffix) {
       }
 
       msg.author.createDM().then((y) => {
-        y.sendMessage(def.join('\n') + attributes.join('\n'))
+        y.send(def.join('\n') + attributes.join('\n'))
       })
     } else {
-      msg.channel.sendMessage(`There is no **${suffix}** command!`)
+      msg.channel.send(`There is no **${suffix}** command!`)
     }
   }
 }
