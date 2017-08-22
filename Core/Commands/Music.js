@@ -55,9 +55,10 @@ Commands.volume = {
   name: 'volume',
   help: "Sets volume or returns actual one if no suffix specified.",
   fn: function (msg, suffix, bot) {
-    if(Number.isInteger(suffix)){
-      DEFAULT_VOLUME = suffix;
-      if(voice_handler !== "undefined"){
+    new_volume = parseInt(suffix);
+    if(Number.isInteger(new_volume)){
+      DEFAULT_VOLUME = new_volume;
+      if(voice_handler !== null){
         voice_handler.setVolume(DEFAULT_VOLUME/100);
       }
     }
