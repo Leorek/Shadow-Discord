@@ -57,7 +57,7 @@ Commands.volume = {
   fn: function (msg, suffix, bot) {
     if(Number.isInteger(suffix)){
       DEFAULT_VOLUME = suffix;
-      if(voice_handler !== undefined){
+      if(voice_handler !== "undefined"){
         voice_handler.setVolume(DEFAULT_VOLUME/100);
       }
     }
