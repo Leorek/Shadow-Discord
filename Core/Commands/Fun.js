@@ -9,7 +9,7 @@ Commands.say = {
     if(suffix.length <= 0){
       msg.reply("I can't say nothing :3");
     }else{
-      msg.channel.send(message, {tts:true});
+      msg.channel.send(suffix, {tts:true});
     }   
   }
 }
