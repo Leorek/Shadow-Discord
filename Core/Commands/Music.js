@@ -34,11 +34,11 @@ Commands.leave = {
   name: 'leave',
   help: "Makes Shadow to .leave actual voice channel.",
   fn: function (msg, suffix) {
-    if(voice_handler !== null) {
-      msg.reply("Skipping...");
-      voice_handler.end();
+    if(voice_connection !== null) {
+      msg.reply("Leaving channel.");
+      voice_connection.channel.leave();
     } else {
-      msg.reply("There is nothing being played.");
+      msg.reply("I'm not in a voice channel.");
     }
   }
 }
