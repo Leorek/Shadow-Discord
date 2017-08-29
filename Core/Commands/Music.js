@@ -43,8 +43,8 @@ Commands.leave = {
   }
 }
 
-Commands.search = {
-  name: 'search',
+Commands.request = {
+  name: 'request',
   help: "Searchs a song on youtube and adds it to the queue.",
   fn: function (msg, suffix) {
     search_video(msg, suffix);
