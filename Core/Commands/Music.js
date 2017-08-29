@@ -47,7 +47,11 @@ Commands.request = {
   name: 'request',
   help: "Searchs a song on youtube and adds it to the queue.",
   fn: function (msg, suffix) {
-    search_video(msg, suffix);
+    if(voice_connection !== null) {
+      search_video(msg, suffix);
+    }else{
+      msg.reply("I must be in a voice channel to do that.")
+    }
   }
 }
 
