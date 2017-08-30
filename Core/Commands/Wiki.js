@@ -37,3 +37,4 @@ Commands.wiki = {
 
 
 exports.Commands = Commands
+exports.Category = "Wiki"

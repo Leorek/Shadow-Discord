@@ -77,3 +77,4 @@ function getTopChampionsOfPlayer(id){
 }
 
 exports.Commands = Commands
+exports.Category = "League"

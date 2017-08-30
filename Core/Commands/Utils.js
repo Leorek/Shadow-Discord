@@ -9,3 +9,4 @@ Commands.avatar = {
 }
 
 exports.Commands = Commands
+exports.Category = "Utils"

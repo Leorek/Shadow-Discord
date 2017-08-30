@@ -12,3 +12,4 @@ Commands.ping = {
 }
 
 exports.Commands = Commands
+exports.Category = "Dev"

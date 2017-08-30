@@ -1,9 +1,8 @@
 'use strict'
 
 var directory = require('require-directory');
-
 var Commands = directory(module, './Commands');
-var FunctionalCommands = []
+var FunctionalCommands = [];
 
 for (var group in Commands) {
   for (var command in Commands[group].Commands) {
@@ -12,32 +11,43 @@ for (var group in Commands) {
 }
 
 exports.helpHandle = function (msg, suffix) {
-  var sorts = {
-    0: [
-      '[Available commands]\n'
-    ]
-  }
-  let counter = 0
+
   if (!suffix) {
-    for (var index in FunctionalCommands) {
-        if (sorts[counter].join('\n').length > 1750) {
-          counter++
-          sorts[counter] = []
-        }
-        sorts[counter].push(index + ' = "' + FunctionalCommands[index].help + '"')
-    }
-    var misc = [
-      'If you want more information on the commands, check the command reference at http://shadowbot.github.io/commands.',
-      'For further questions, join our server: https://discord.gg/RjfxeP5'
-    ]
     msg.author.createDM().then((y) => {
       if (!msg.isPrivate) {
         msg.channel.send('Help is underway ' + msg.author.username + '!')
       }
-      for (var r in sorts) {
-        y.send(`\`\`\`ini\n${sorts[r].sort().join('\n')}\n\`\`\``) // FIXME: The entire commands array should sort instead of the sorts one
+      var fields = [];
+      var groupCommands = [];
+
+      for(var group in Commands){
+        for(command in Commands[group].Commands){
+          groupCommands.push("**" + command + ":** " + Commands[group].Commands[command].help);
+        }
+        
+        fields.push({
+          "name": Commands[group].Category,
+          "value": groupCommands.join("\n")
+        });
+        groupCommands = [];
       }
-      y.send(misc.join('\n'))
+      var misc = [
+        'If you want more information on the commands, check the command reference at http://shadowbot.github.io/commands.',
+        'For further questions, join our server: https://discord.gg/RjfxeP5'
+      ]
+      y.send(
+          {
+            "embed": {
+              "color": 2645853,
+              "description": misc.join('\n'),
+              "author": {
+                "name": "Commands",
+                "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+              },
+              "fields": fields
+            }
+          }
+        );
     }).catch((e) => {
       //Logger.error(e)
       msg.channel.send('Well, this is awkward, something went wrong while trying to PM you. Do you have them enabled on this server?')

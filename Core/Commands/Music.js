@@ -349,3 +349,4 @@ function isQueueEmpty(guildId) {
 }
 
 exports.Commands = Commands
+exports.Category = "Music"

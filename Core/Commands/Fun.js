@@ -101,3 +101,4 @@ Commands.yomomma = {
 }
 
 exports.Commands = Commands
+exports.Category = "Fun"
