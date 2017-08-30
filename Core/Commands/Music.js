@@ -75,7 +75,23 @@ Commands.volume = {
         musicStream[msg.guild.id].setVolume(actualVolume[msg.guild.id]/100);
       }
     }
-    msg.reply("Volume: " + actualVolume[msg.guild.id] + "%");
+    msg.channel.send(
+      {
+        "embed": {
+          "color": 2645853,
+          "author": {
+            "name": "Shadow player",
+            "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+          },
+          "fields": [
+            {
+              "name": "Info",
+              "value": "Volume: " + actualVolume[msg.guild.id] + "%"
+            }
+          ]
+        }
+      }
+    );   
   }
 }
 
@@ -161,7 +177,23 @@ Commands.queue = {
           }
         );
       }else{
-        msg.reply("The queue is empty.");
+        msg.channel.send(
+          {
+            "embed": {
+              "color": 2645853,
+              "author": {
+                "name": "Shadow player",
+                "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+              },
+              "fields": [
+                {
+                  "name": "Info",
+                  "value": "The queue is empty."
+                }
+              ]
+            }
+          }
+        );
       }
     }else{
       msg.reply("I'm not connected to a voice channel.");
