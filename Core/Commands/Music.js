@@ -184,22 +184,38 @@ function searchVideo(msg, query) {
   })
 }
 
-function addToQueue(video, msg, mute = false) {
+function addToQueue(video, msg) {
 
   var videoId = getVideoId(video);
 
   ytdl.getInfo("https://www.youtube.com/watch?v=" + videoId, (error, info) => {
+    var msgInfo = "";
     if(error) {
-      msg.reply("The requested video (" + videoId + ") does not exist or cannot be played.");
+      msgInfo = "The requested video (" + videoId + ") does not exist or cannot be played.";
     } else {
       queue[msg.guild.id].push({title: info["title"], id: videoId, user: msg.author.username});
-      if (!mute) {
-        msg.reply('"' + info["title"] + '" has been added to the queue.');
-      }
+      msgInfo = '"' + info["title"] + '" has been added to the queue.'
       if(!isPaused[msg.guild.id] && !isBotPlaying(msg.guild.id) && queue[msg.guild.id].length === 1) {
         playNextSong(msg);
       }
     }
+    msg.channel.send(
+      {
+        "embed": {
+          "color": 2645853,
+          "author": {
+            "name": "Shadow player",
+            "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+          },
+          "fields": [
+            {
+              "name": "Info",
+              "value": msgInfo
+            }
+          ]
+        }
+      }
+    );
   });
 }
 
@@ -216,7 +232,23 @@ function getVideoId(string) {
 
 function playNextSong(msg) {
   if(isQueueEmpty(msg.guild.id)) {
-    channelToSendInfo[msg.guild.id].sendmsg("The queue is empty!");
+    channelToSendInfo[msg.guild.id].send(
+      {
+        "embed": {
+          "color": 2645853,
+          "author": {
+            "name": "Shadow player",
+            "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+          },
+          "fields": [
+            {
+              "name": "Info",
+              "value": "The queue is empty."
+            }
+          ]
+        }
+      }
+    );
   }
 
   var videoId = queue[msg.guild.id][0]["id"];
@@ -252,7 +284,24 @@ function playNextSong(msg) {
     if(!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
       playNextSong(msg);
     }else if(isQueueEmpty(msg.guild.id)){
-      channelToSendInfo[msg.guild.id].send("There are no more songs in the queue.");
+
+      channelToSendInfo[msg.guild.id].send(
+        {
+          "embed": {
+            "color": 2645853,
+            "author": {
+              "name": "Shadow player",
+              "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+            },
+            "fields": [
+              {
+                "name": "Info",
+                "value": "No more songs in the queue"
+              }
+            ]
+          }
+        }
+      );
     }
   });
 
