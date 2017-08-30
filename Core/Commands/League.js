@@ -55,7 +55,8 @@ Commands.leagueprofile = {
                 });
             })
         .catch(err => {
-            msg.reply(err);
+            msg.reply("There was an error while calling the API.");
+            console.log(err);
     });
     }
   }
