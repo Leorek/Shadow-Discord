@@ -10,6 +10,7 @@ var musicStream = [];
 var actualVolume = [];
 var isPaused = [];
 var queue = [];
+var nowPlaying = [];
 
 var Commands = [];
 
@@ -28,6 +29,7 @@ Commands.join = {
           queue[msg.guild.id] = [];
           actualVolume[msg.guild.id] = 100;
           isPaused[msg.guild.id] = false;
+          nowPlaying[msg.guild.id] = {};
         })
         .catch(console.log);
     } else {
@@ -142,12 +144,16 @@ Commands.queue = {
             "embed": {
               "color": 2645853,
               "author": {
-                "name": "Shadow's queue",
+                "name": "Shadow player",
                 "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
               },
               "fields": [
                 {
-                  "name": "Items",
+                  "name": "Now Playing",
+                  "value": "\"" + nowPlaying[msg.guild.id].title + "\" requested by " + nowPlaying[msg.guild.id].user
+                },
+                {
+                  "name": "Queue",
                   "value": queueItems.join(" \n ")
                 }
               ]
@@ -217,7 +223,26 @@ function playNextSong(msg) {
   var title = queue[msg.guild.id][0]["title"];
   var user = queue[msg.guild.id][0]["user"];
 
-  channelToSendInfo[msg.guild.id].send('Now playing: "' + title + '" (requested by ' + user + ')');
+  nowPlaying[msg.guild.id]["title"] = title;
+  nowPlaying[msg.guild.id]["user"] = user;
+
+  channelToSendInfo[msg.guild.id].send(
+    {
+      "embed": {
+        "color": 2645853,
+        "author": {
+          "name": "Shadow player",
+          "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
+        },
+        "fields": [
+          {
+            "name": "Now Playing",
+            "value": "\"" + title + "\" requested by " + user
+          }
+        ]
+      }
+    }
+  );
 
   var audio_stream = ytdl("https://www.youtube.com/watch?v=" + videoId,{filter: 'audioonly'});
   musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(audio_stream,{seek: 0, volume: (actualVolume[msg.guild.id]/100)});
