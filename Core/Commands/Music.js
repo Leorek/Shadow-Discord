@@ -27,7 +27,7 @@ Commands.join = {
           voiceConnection[msg.guild.id] = connection;
           queue[msg.guild.id] = [];
           actualVolume[msg.guild.id] = 100;
-          isPaused[msg.guild.id] = true;
+          isPaused[msg.guild.id] = false;
         })
         .catch(console.log);
     } else {
@@ -40,7 +40,7 @@ Commands.leave = {
   name: 'leave',
   help: "Makes Shadow to leave actual voice channel.",
   fn: function (msg, suffix) {
-    if(voiceConnection[msg.guild.id] !== null) {
+    if(voiceConnection[msg.guild.id] !== undefined) {
       msg.reply("Leaving voice channel.");
       voiceConnection[msg.guild.id].channel.leave();
       queue[msg.guild.id] = undefined;
@@ -81,12 +81,16 @@ Commands.pause = {
   name: 'pause',
   help: "Pauses the actual song.",
   fn: function (msg, suffix) {
-    if(!isPaused[msg.guild.id]){
-      msg.reply("Pausing player.");
-      isPaused[msg.guild.id] = true;
-      musicStream[msg.guild.id].pause();
+    if(musicStream[msg.guild.id] !== undefined){
+      if(!isPaused[msg.guild.id]){
+        msg.reply("Pausing player.");
+        isPaused[msg.guild.id] = true;
+        musicStream[msg.guild.id].pause();
+      }else{
+        msg.reply("The player is already paused.");
+      }
     }else{
-      msg.reply("The player is already paused.");
+      msg.reply("The player is not playing anything.");
     }
   }
 }
@@ -186,7 +190,7 @@ function addToQueue(video, msg, mute = false) {
       if (!mute) {
         msg.reply('"' + info["title"] + '" has been added to the queue.');
       }
-      if(!isPaused && !isBotPlaying(msg.guild.id) && queue[msg.guild.id].length === 1) {
+      if(!isPaused[msg.guild.id] && !isBotPlaying(msg.guild.id) && queue[msg.guild.id].length === 1) {
         playNextSong(msg);
       }
     }
@@ -213,7 +217,7 @@ function playNextSong(msg) {
   var title = queue[msg.guild.id][0]["title"];
   var user = queue[msg.guild.id][0]["user"];
 
-  channelToSendInfo.send('Now playing: "' + title + '" (requested by ' + user + ')');
+  channelToSendInfo[msg.guild.id].send('Now playing: "' + title + '" (requested by ' + user + ')');
 
   var audio_stream = ytdl("https://www.youtube.com/watch?v=" + videoId,{filter: 'audioonly'});
   musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(audio_stream,{seek: 0, volume: (actualVolume[msg.guild.id]/100)});
@@ -231,7 +235,7 @@ function playNextSong(msg) {
 }
 
 function isBotPlaying(guildId) {
-  return musicStream[guildId] !== null;
+  return musicStream[guildId] !== undefined;
 }
 
 function isQueueEmpty(guildId) {
