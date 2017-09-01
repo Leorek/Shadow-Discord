@@ -46,7 +46,7 @@ Config.json
 ---
 
 <p align="center">
-  <a href="https://github.com/feross/standard"><img src="https://cdn.rawgit.com/feross/standard/master/badge.svg" alt="JavaScript Standard Code Style"></a>
+  <a href="https://github.com/standard/standard"><img src="https://cdn.rawgit.com/standard/standard/master/badge.svg" alt="JavaScript Standard Code Style"></a>
 </p>
 
 ---
