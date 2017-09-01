@@ -1,60 +1,59 @@
 'use strict'
-
-var directory = require('require-directory');
-var Commands = directory(module, './Commands');
-var FunctionalCommands = [];
+var Config = require('../config.json')
+var directory = require('require-directory')
+var Commands = directory(module, './Commands')
+var FunctionalCommands = []
 
 for (var group in Commands) {
   for (var command in Commands[group].Commands) {
-    FunctionalCommands[command] = Commands[group].Commands[command];
+    FunctionalCommands[command] = Commands[group].Commands[command]
   }
 }
 
-exports.helpHandle = function (msg, suffix) {
-
+exports.helpHandle = function (msg, suffix, botUser) {
   if (!suffix) {
     msg.author.createDM().then((y) => {
       if (!msg.isPrivate) {
         msg.channel.send('Help is underway ' + msg.author.username + '!')
       }
-      var fields = [];
-      var groupCommands = [];
+      var fields = []
+      var groupCommands = []
 
-      for(var group in Commands){
-        for(command in Commands[group].Commands){
-          groupCommands.push("**" + command + ":** " + Commands[group].Commands[command].help);
+      for (var group in Commands) {
+        for (command in Commands[group].Commands) {
+          groupCommands.push('**' + command + ':** ' + Commands[group].Commands[command].help)
         }
-        
+
         fields.push({
-          "name": Commands[group].Category,
-          "value": groupCommands.join("\n")
-        });
-        groupCommands = [];
+          'name': Commands[group].Category,
+          'value': groupCommands.join('\n')
+        })
+        groupCommands = []
       }
       var misc = [
         'If you want more information on the commands, check the command reference at http://shadowbot.github.io/commands.',
         'For further questions, join our server: https://discord.gg/RjfxeP5'
       ]
       y.send(
-          {
-            "embed": {
-              "color": 2645853,
-              "description": misc.join('\n'),
-              "author": {
-                "name": "Commands",
-                "icon_url": "http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png"
-              },
-              "fields": fields
-            }
+        {
+          'embed': {
+            'color': 2645853,
+            'description': misc.join('\n'),
+            'author': {
+              'name': 'Commands',
+              'icon_url': botUser.avatarURL
+            },
+            'fields': fields
           }
-        );
+        }
+        )
     }).catch((e) => {
-      //Logger.error(e)
+      // Logger.error(e)
       msg.channel.send('Well, this is awkward, something went wrong while trying to PM you. Do you have them enabled on this server?')
     })
   } else if (suffix) {
     if (FunctionalCommands[suffix]) {
-      var c = FunctionalCommands[suffix];
+      var c = FunctionalCommands[suffix]
       var attributes = []
       var name
       for (var x in FunctionalCommands) {
@@ -68,7 +67,7 @@ exports.helpHandle = function (msg, suffix) {
         `What this does: \`${c.help}\``,
         'Example:',
         '```',
-        `${(c.usage) ? config.settings.prefix + name + ' ' + c.usage : config.settings.prefix + name}`,
+        `${(c.usage) ? Config.settings.prefix + name + ' ' + c.usage : Config.settings.prefix + name}`,
         '```',
         `**Required access level**: ${c.level}`,
         `${(c.aliases) ? '**Aliases for this command**: ' + c.aliases.join(', ') + '\n' : ''}`
