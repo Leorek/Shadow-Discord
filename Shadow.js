@@ -25,7 +25,7 @@ Client.on('message', msg => {
     Logger.info('Executing %s from %s', command, msg.author.username)
 
     try {
-      UserCenter.userHasPermissions(msg.author, command).then(hasPermissions => {
+      UserCenter.userHasPermissions(msg.author, CommandCenter.Commands[command]).then(hasPermissions => {
         if (hasPermissions) {
           CommandCenter.Commands[command].fn(msg, suffix)
         } else {

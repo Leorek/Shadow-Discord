@@ -3,6 +3,7 @@ var Commands = []
 Commands.ping = {
   name: 'ping',
   help: "I'll reply to you with pong!",
+  permissions: ['member'],
   fn: function (msg) {
     var initTime = new Date(msg.timestamp)
     msg.reply('Pong!').then((m) => {

@@ -1,3 +1,10 @@
+const Fs = require('fs')
+const MakeDir = require('make-dir')
+
+if (!Fs.existsSync('./Logs/')) {
+  MakeDir.sync('./Logs/')
+}
+
 var Bunyan = require('bunyan')
 var Logger = Bunyan.createLogger(
   {

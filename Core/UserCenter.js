@@ -9,7 +9,13 @@ exports.userHasPermissions = function (user, command) {
     var userEntry = getUserEntry(user)
     userEntry.then(user => {
       Logger.debug('User obtained from database: ' + user)
-      resolve(true)
+      var hasPermission = false
+      command.permissions.forEach(group => {
+        if (!hasPermission && user.permissions.indexOf(group) > -1) {
+          hasPermission = true
+        }
+      })
+      resolve(hasPermission)
     }).catch(err => {
       reject(err)
     })

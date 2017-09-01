@@ -25,6 +25,7 @@
     "bunyan": "^1.8.12",
     "discord.js": "^11.1.0",
     "leaguejs": "^1.4.0",
+    "make-dir": "^1.0.0",
     "mongoose": "^4.11.9",
     "node-opus": "^0.2.6",
     "nodemw": "^0.10.1",
