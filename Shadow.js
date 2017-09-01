@@ -1,23 +1,9 @@
 const Discord = require('discord.js')
 const Client = new Discord.Client({autoReconnect: true, max_message_cache: 0})
-var Bunyan = require('bunyan')
-var Logger = Bunyan.createLogger(
-  {
-    name: 'Shadow',
-    streams: [
-      {
-        level: 'info',
-        path: './shadow.log'
-      },
-      {
-        level: 'error',
-        path: './shadow.log'
-      }
-    ]
-  })
-
+var Logger = require('./Core/Logger.js').Logger
 var Config = require('./config.json')
 var CommandCenter = require('./Core/CommandCenter.js')
+var UserCenter = require('./Core/UserCenter.js')
 let prefix = Config.settings.prefix
 
 Client.on('ready', () => {
@@ -39,7 +25,13 @@ Client.on('message', msg => {
     Logger.info('Executing %s from %s', command, msg.author.username)
 
     try {
-      CommandCenter.Commands[command].fn(msg, suffix)
+      UserCenter.userHasPermissions(msg.author, command).then(hasPermissions => {
+        if (hasPermissions) {
+          CommandCenter.Commands[command].fn(msg, suffix)
+        } else {
+          msg.reply("You don't have permissions to execute this command.")
+        }
+      })
     } catch (e) {
       msg.channel.send('An error ocurred processing this command.')
       Logger.error(e)
