@@ -17,14 +17,15 @@ var Commands = []
 Commands.join = {
   name: 'join',
   help: 'Makes Shadow to join a voice channel.',
-  fn: function (msg, suffix) {
+  permissions: ['member'],
+  fn: function (msg, suffix, lang) {
     if (!msg.guild) return
     channelToSendInfo[msg.guild.id] = msg.guild.channels.find(chn => chn.name === 'general' && chn.type === 'text')
     if (channelToSendInfo[msg.guild.id] === null) throw new Error("Couldn't find text channel '#" + 'general' + "' in server.")
     if (msg.member.voiceChannel) {
       msg.member.voiceChannel.join()
         .then(connection => {
-          msg.reply('I have successfully connected to the channel!')
+          msg.reply(lang.__('join_voice_channel_success'))
           voiceConnection[msg.guild.id] = connection
           queue[msg.guild.id] = []
           actualVolume[msg.guild.id] = 100
@@ -33,7 +34,7 @@ Commands.join = {
         })
         .catch(console.log)
     } else {
-      msg.reply('You need to join a voice channel first!')
+      msg.reply(lang.__('join_voice_channel_success'))
     }
   }
 }
@@ -41,13 +42,14 @@ Commands.join = {
 Commands.leave = {
   name: 'leave',
   help: 'Makes Shadow to leave actual voice channel.',
-  fn: function (msg, suffix) {
+  permissions: ['member'],
+  fn: function (msg, suffix, lang) {
     if (voiceConnection[msg.guild.id] !== undefined) {
-      msg.reply('Leaving voice channel.')
+      msg.reply(lang.__('leave_voice_channel'))
       voiceConnection[msg.guild.id].channel.leave()
       queue[msg.guild.id] = undefined
     } else {
-      msg.reply("I'm not in a voice channel.")
+      msg.reply(lang.__('not_in_a_voice_channel'))
     }
   }
 }
@@ -55,11 +57,12 @@ Commands.leave = {
 Commands.request = {
   name: 'request',
   help: 'Searchs a song on youtube and adds it to the queue.',
-  fn: function (msg, suffix) {
+  permissions: ['member'],
+  fn: function (msg, suffix, lang) {
     if (voiceConnection[msg.guild.id] !== null) {
       searchVideo(msg, suffix)
     } else {
-      msg.reply('I must be in a voice channel to do that.')
+      msg.reply(lang.__('not_in_a_voice_channel'))
     }
   }
 }
@@ -67,7 +70,8 @@ Commands.request = {
 Commands.volume = {
   name: 'volume',
   help: 'Sets volume or returns actual one if no suffix specified.',
-  fn: function (msg, suffix, bot) {
+  permissions: ['member'],
+  fn: function (msg, suffix, lang, bot) {
     var newVolume = parseInt(suffix)
     if (Number.isInteger(newVolume)) {
       actualVolume[msg.guild.id] = newVolume
@@ -86,7 +90,7 @@ Commands.volume = {
           'fields': [
             {
               'name': 'Info',
-              'value': 'Volume: ' + actualVolume[msg.guild.id] + '%'
+              'value': lang.__('Volume: %i %', actualVolume[msg.guild.id])
             }
           ]
         }
@@ -98,6 +102,7 @@ Commands.volume = {
 Commands.pause = {
   name: 'pause',
   help: 'Pauses the actual song.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     if (musicStream[msg.guild.id] !== undefined) {
       if (!isPaused[msg.guild.id]) {
@@ -116,6 +121,7 @@ Commands.pause = {
 Commands.resume = {
   name: 'resume',
   help: 'Resumes the actual song.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     if (isPaused[msg.guild.id]) {
       msg.reply('Resuming player.')
@@ -130,6 +136,7 @@ Commands.resume = {
 Commands.skip = {
   name: 'skip',
   help: 'Skips the actual song.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     if (voiceConnection[msg.guild.id]) {
       if (isBotPlaying(msg.guild.id)) {
@@ -147,6 +154,7 @@ Commands.skip = {
 Commands.queue = {
   name: 'queue',
   help: 'Shows the actual queue.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     if (queue[msg.guild.id] !== undefined) {
       if (!isQueueEmpty(msg.guild.id)) {

@@ -1,0 +1,10 @@
+{
+	"hello": "hello",
+	"join_voice_channel_success": "I have successfully connected to the channel!",
+	"must_join_voice_channel": "You need to join a voice channel first!",
+	"leave_voice_channel": "Leaving voice channel.",
+	"not_in_a_voice_channel": "I'm not in a voice channel.",
+	"Volume: %s%": "Volume: %s%",
+	"Volume: %s %": "Volume: %s %",
+	"Volume: %i %": "Volume: %i %"
+}

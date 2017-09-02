@@ -10,7 +10,7 @@ for (var group in Commands) {
   }
 }
 
-exports.helpHandle = function (msg, suffix, botUser) {
+exports.helpHandle = function (msg, suffix, lang, botUser) {
   if (!suffix) {
     msg.author.createDM().then((y) => {
       if (!msg.isPrivate) {

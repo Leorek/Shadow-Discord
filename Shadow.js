@@ -1,5 +1,9 @@
 const Discord = require('discord.js')
 const Client = new Discord.Client({autoReconnect: true, max_message_cache: 0})
+const Lang = require('i18n')
+Lang.configure({
+  directory: './Locales'
+})
 var Logger = require('./Core/Logger.js').Logger
 var Config = require('./config.json')
 var CommandCenter = require('./Core/CommandCenter.js')
@@ -7,6 +11,7 @@ var UserCenter = require('./Core/UserCenter.js')
 let prefix = Config.settings.prefix
 
 Client.on('ready', () => {
+  Logger.info('Shadow is up and ready.')
   Client.user.setGame('leorek.gitlab.io')
 })
 
@@ -27,7 +32,7 @@ Client.on('message', msg => {
     try {
       UserCenter.userHasPermissions(msg.author, CommandCenter.Commands[command]).then(hasPermissions => {
         if (hasPermissions) {
-          CommandCenter.Commands[command].fn(msg, suffix)
+          CommandCenter.Commands[command].fn(msg, suffix, Lang)
         } else {
           msg.reply("You don't have permissions to execute this command.")
         }
@@ -38,7 +43,7 @@ Client.on('message', msg => {
     }
   } else if (command === 'help') {
     Logger.info('Executing %s from %s', command, msg.author.username)
-    CommandCenter.helpHandle(msg, suffix, Client.user)
+    CommandCenter.helpHandle(msg, suffix, Lang, Client.user)
   }
 })
 

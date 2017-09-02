@@ -12,5 +12,17 @@ Commands.ping = {
   }
 }
 
+Commands.test = {
+  name: 'test',
+  help: "I'll test whatever you want!",
+  permissions: ['member'],
+  fn: function (msg, suffix, lang) {
+    msg.reply(lang.__('hello'))
+    lang.setLocale('es')
+    msg.reply(lang.__('hello'))
+    lang.setLocale('en')
+  }
+}
+
 exports.Commands = Commands
 exports.Category = 'Dev'

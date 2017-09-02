@@ -8,6 +8,7 @@ const dataDragonVersion = '7.17.1'
 Commands.leagueprofile = {
   name: 'leagueprofile',
   help: 'Get your profile info of league of legends.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     LeagueApi.Summoner
         .gettingByName(suffix)

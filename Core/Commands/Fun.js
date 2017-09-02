@@ -4,6 +4,7 @@ var Request = require('request')
 Commands.say = {
   name: 'say',
   help: 'Repeats with tts!',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     if (suffix.length <= 0) {
       msg.reply("I can't say nothing :3")
@@ -16,6 +17,7 @@ Commands.say = {
 Commands.randomcat = {
   name: 'randomcat',
   help: 'Sends a random picture or gif of cats.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     Request('http://random.cat/meow', function (error, response, body) {
       if (!error && response.statusCode === 200) {
@@ -37,6 +39,7 @@ Commands.randomcat = {
 Commands.randomdog = {
   name: 'randomdog',
   help: 'Sends a random picture or gif of doggies.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     Request('http://thedogapi.co.uk/api/v1/dog?limit=1', function (error, response, body) {
       if (!error && response.statusCode === 200) {
@@ -58,6 +61,7 @@ Commands.randomdog = {
 Commands.yesno = {
   name: 'yesno',
   help: 'Sends a random gif or picture with yes or no',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     Request('https://yesno.wtf/api/', function (error, response, body) {
       if (!error && response.statusCode === 200) {
@@ -79,6 +83,7 @@ Commands.yesno = {
 Commands.yomomma = {
   name: 'yomomma',
   help: 'Sends a random joke about ur mum.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     Request('http://api.yomomma.info/', function (error, response, body) {
       if (!error && response.statusCode === 200) {

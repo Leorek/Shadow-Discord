@@ -20,6 +20,7 @@ var iclient = new mwbot({
 Commands.wiki = {
   name: 'wiki',
   help: 'Searchs on wikipedia!.',
+  permissions: ['member'],
   fn: function (msg, suffix) {
     console.log('------------- STARTING QUERY -------------')
     mwclient.getArticle(suffix, undefined, function (err, info, next) {
