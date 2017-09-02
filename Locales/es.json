@@ -3,5 +3,7 @@
 	"join_voice_channel_success": "¡Conectado al canal de voz correctamente!",
 	"must_join_voice_channel": "¡Tienes que unirte a un canal de voz primero!",
 	"leave_voice_channel": "Saliendo del canal de voz.",
-	"not_in_a_voice_channel": "No estoy en un canal de voz."
+	"not_in_a_voice_channel": "No estoy en un canal de voz.",
+	"volume_parameter_info": "El volumen debe estar entre 0 y 100",
+	"locale_changed_to": "locale_changed_to"
 }

@@ -4,7 +4,6 @@
 	"must_join_voice_channel": "You need to join a voice channel first!",
 	"leave_voice_channel": "Leaving voice channel.",
 	"not_in_a_voice_channel": "I'm not in a voice channel.",
-	"Volume: %s%": "Volume: %s%",
-	"Volume: %s %": "Volume: %s %",
-	"Volume: %i %": "Volume: %i %"
+	"Volume: %i %": "Volume: %i %",
+	"volume_parameter_info": "Volume must be between 0 and 100"
 }

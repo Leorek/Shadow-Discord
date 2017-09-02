@@ -1,6 +1,7 @@
 var ytdl = require('ytdl-core')
 var Request = require('request')
 var Config = require('../../config.json')
+const Logger = require('../Logger.js').Logger
 
 // Handlers
 var channelToSendInfo = []
@@ -30,7 +31,7 @@ Commands.join = {
           queue[msg.guild.id] = []
           actualVolume[msg.guild.id] = 100
           isPaused[msg.guild.id] = false
-          nowPlaying[msg.guild.id] = {}
+          nowPlaying[msg.guild.id] = null
         })
         .catch(console.log)
     } else {
@@ -74,9 +75,13 @@ Commands.volume = {
   fn: function (msg, suffix, lang, bot) {
     var newVolume = parseInt(suffix)
     if (Number.isInteger(newVolume)) {
-      actualVolume[msg.guild.id] = newVolume
-      if (isBotPlaying(msg.guild.id)) {
-        musicStream[msg.guild.id].setVolume(actualVolume[msg.guild.id] / 100)
+      if (newVolume >= 0 && newVolume <= 100) {
+        actualVolume[msg.guild.id] = newVolume
+        if (isBotPlaying(msg.guild.id)) {
+          musicStream[msg.guild.id].setVolume(actualVolume[msg.guild.id] / 100)
+        }
+      } else {
+        msg.reply(lang.__('volume_parameter_info'))
       }
     }
     msg.channel.send(
@@ -235,7 +240,9 @@ function addToQueue (video, msg) {
     } else {
       queue[msg.guild.id].push({title: info['title'], id: videoId, user: msg.author.username})
       msgInfo = '"' + info['title'] + '" has been added to the queue.'
+      Logger.debug('isPaused: ' + isPaused[msg.guild.id] + ' isBotPlaying: ' + isBotPlaying(msg.guild.id) + ' queueLength: ' + queue[msg.guild.id].length)
       if (!isPaused[msg.guild.id] && !isBotPlaying(msg.guild.id) && queue[msg.guild.id].length === 1) {
+        Logger.debug("Let's play this song")
         playNextSong(msg)
       }
     }
@@ -271,32 +278,15 @@ function getVideoId (string) {
 }
 
 function playNextSong (msg) {
-  if (isQueueEmpty(msg.guild.id)) {
-    channelToSendInfo[msg.guild.id].send(
-      {
-        'embed': {
-          'color': 2645853,
-          'author': {
-            'name': 'Shadow player',
-            'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-          },
-          'fields': [
-            {
-              'name': 'Info',
-              'value': 'The queue is empty.'
-            }
-          ]
-        }
-      }
-    )
-  }
-
   var videoId = queue[msg.guild.id][0]['id']
   var title = queue[msg.guild.id][0]['title']
   var user = queue[msg.guild.id][0]['user']
 
-  nowPlaying[msg.guild.id]['title'] = title
-  nowPlaying[msg.guild.id]['user'] = user
+  nowPlaying[msg.guild.id] = {}
+  nowPlaying[msg.guild.id].title = title
+  nowPlaying[msg.guild.id].user = user
+
+  Logger.info('NowPlaying: ' + nowPlaying[msg.guild.id].title)
 
   channelToSendInfo[msg.guild.id].send(
     {
@@ -318,9 +308,11 @@ function playNextSong (msg) {
 
   var audioStream = ytdl('https://www.youtube.com/watch?v=' + videoId, {filter: 'audioonly'})
   musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(audioStream, {seek: 0, volume: (actualVolume[msg.guild.id] / 100)})
-
+  
   musicStream[msg.guild.id].once('end', reason => {
-    musicStream[msg.guild.id] = null
+    Logger.debug(nowPlaying[msg.guild.id].title + ' ended.')
+    nowPlaying[msg.guild.id] = null
+    Logger.debug('isPaused:' + isPaused[msg.guild.id] + ' isQueueEmpty: ' + isQueueEmpty(msg.guild.id) + 'queue: ' + queue[msg.guild.id])
     if (!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
       playNextSong(msg)
     } else if (isQueueEmpty(msg.guild.id)) {
@@ -345,10 +337,11 @@ function playNextSong (msg) {
   })
 
   queue[msg.guild.id].splice(0, 1)
+  Logger.debug("queueLength: " + queue[msg.guild.id].length)
 }
 
 function isBotPlaying (guildId) {
-  return musicStream[guildId] !== undefined
+  return nowPlaying[guildId] !== null
 }
 
 function isQueueEmpty (guildId) {

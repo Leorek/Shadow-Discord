@@ -40,19 +40,19 @@ Commands.randomdog = {
   name: 'randomdog',
   help: 'Sends a random picture or gif of doggies.',
   permissions: ['member'],
-  fn: function (msg, suffix) {
-    Request('http://thedogapi.co.uk/api/v1/dog?limit=1', function (error, response, body) {
+  fn: function (msg, suffix, lang) {
+    Request('https://api.thedogapi.co.uk/v2/dog.php?limit=1', function (error, response, body) {
       if (!error && response.statusCode === 200) {
         try {
           JSON.parse(body)
         } catch (e) {
-          msg.channel.send('Mala respuesta desde la api')
+          msg.channel.send(lang.__('bad_answer_from_api'))
           return
         }
         var dog = JSON.parse(body)
         msg.channel.send(dog.data[0].url)
       } else {
-        msg.channel.send('Ups algo ha ido mal, vuelve a intentarlo')
+        msg.channel.send(lang.__('something_went_wrong'))
       }
     })
   }
