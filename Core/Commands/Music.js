@@ -312,7 +312,7 @@ function playNextSong (msg) {
   musicStream[msg.guild.id].once('end', reason => {
     Logger.debug(nowPlaying[msg.guild.id].title + ' ended.')
     nowPlaying[msg.guild.id] = null
-    Logger.debug('isPaused:' + isPaused[msg.guild.id] + ' isQueueEmpty: ' + isQueueEmpty(msg.guild.id) + 'queue: ' + queue[msg.guild.id])
+    Logger.debug('isPaused:' + isPaused[msg.guild.id] + ' isQueueEmpty: ' + isQueueEmpty(msg.guild.id) + ' queue: ' + queue[msg.guild.id].length)
     if (!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
       playNextSong(msg)
     } else if (isQueueEmpty(msg.guild.id)) {

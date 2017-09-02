@@ -8,7 +8,7 @@ exports.userHasPermissions = function (user, command) {
     Logger.debug('Checking if user ' + user.username + ' has permissions to execute "' + command.name + '"')
     var userEntry = getUserEntry(user)
     userEntry.then(user => {
-      Logger.debug('User obtained from database: ' + user)
+      // Logger.debug('User obtained from database: ' + user)
       var hasPermission = false
       command.permissions.forEach(group => {
         if (!hasPermission && user.permissions.indexOf(group) > -1) {
