@@ -12,16 +12,18 @@ let prefix = Config.settings.prefix
 
 Client.on('ready', () => {
   Logger.info('Shadow is up and ready.')
+  /*
   var generalChannel = null
   Client.guilds.forEach(guild => {
     generalChannel = guild.channels.find(chn => chn.name === 'general' && chn.type === 'text')
     if (generalChannel !== null) {
       generalChannel.send('Shadow is up and ready')
     }
-  })
+  }) */
 })
 
 Client.on('message', msg => {
+  Logger.debug('Message received')
   if (!msg.content.startsWith(prefix)) return
   if (msg.author.bot) return
 

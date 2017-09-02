@@ -9,6 +9,15 @@ Commands.avatar = {
   }
 }
 
+Commands.invite = {
+  name: 'invite',
+  help: 'Generates a link to invite Shadow to your server.',
+  permissions: ['member'],
+  fn: function (msg, suffix, lang) {
+    msg.reply('https://discordapp.com/api/oauth2/authorize?client_id=' + 255450979057532928 + '&scope=bot&permissions=0')
+  }
+}
+
 Commands.lang = {
   name: 'lang',
   help: 'Changes Shadow language.',
