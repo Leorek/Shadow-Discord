@@ -23,7 +23,6 @@ Client.on('ready', () => {
 })
 
 Client.on('message', msg => {
-  Logger.debug('Message received')
   if (!msg.content.startsWith(prefix)) return
   if (msg.author.bot) return
 

@@ -23,7 +23,7 @@ Commands.join = {
     if (!msg.guild) return
     channelToSendInfo[msg.guild.id] = msg.guild.channels.find(chn => chn.name === 'general' && chn.type === 'text')
     if (channelToSendInfo[msg.guild.id] === null) throw new Error("Couldn't find text channel '#" + 'general' + "' in server.")
-    if (msg.member.voiceChannel) {
+    if (msg.member.voiceChannel !== undefined) {
       msg.member.voiceChannel.join()
         .then(connection => {
           msg.reply(lang.__('join_voice_channel_success'))
@@ -35,7 +35,7 @@ Commands.join = {
         })
         .catch(console.log)
     } else {
-      msg.reply(lang.__('join_voice_channel_success'))
+      msg.reply(lang.__('not_in_a_voice_channel'))
     }
   }
 }
@@ -146,7 +146,7 @@ Commands.skip = {
     if (voiceConnection[msg.guild.id]) {
       if (isBotPlaying(msg.guild.id)) {
         msg.reply('Skipping...')
-        musicStream[msg.guild.id].end()
+        musicStream[msg.guild.id].end('skip')
       } else {
         msg.reply('There is nothing being played.')
       }
@@ -285,6 +285,7 @@ function playNextSong (msg) {
   nowPlaying[msg.guild.id] = {}
   nowPlaying[msg.guild.id].title = title
   nowPlaying[msg.guild.id].user = user
+  nowPlaying[msg.guild.id].id = videoId
 
   Logger.info('NowPlaying: ' + nowPlaying[msg.guild.id].title)
 
@@ -305,39 +306,53 @@ function playNextSong (msg) {
       }
     }
   )
+  playSong(msg.guild.id)
 
-  var audioStream = ytdl('https://www.youtube.com/watch?v=' + videoId, {filter: 'audioonly'})
-  musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(audioStream, {seek: 0, volume: (actualVolume[msg.guild.id] / 100)})
-  
   musicStream[msg.guild.id].once('end', reason => {
-    Logger.debug(nowPlaying[msg.guild.id].title + ' ended.')
-    nowPlaying[msg.guild.id] = null
-    Logger.debug('isPaused:' + isPaused[msg.guild.id] + ' isQueueEmpty: ' + isQueueEmpty(msg.guild.id) + ' queue: ' + queue[msg.guild.id].length)
-    if (!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
-      playNextSong(msg)
-    } else if (isQueueEmpty(msg.guild.id)) {
-      channelToSendInfo[msg.guild.id].send(
-        {
-          'embed': {
-            'color': 2645853,
-            'author': {
-              'name': 'Shadow player',
-              'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-            },
-            'fields': [
-              {
-                'name': 'Info',
-                'value': 'No more songs in the queue'
-              }
-            ]
+    Logger.debug(nowPlaying[msg.guild.id].title + ' ended because ' + reason)
+    if (reason === undefined) {
+      Logger.debug('This song ended prematurely, replaying.')
+      playSong(msg.guild.id)
+    } else {
+      nowPlaying[msg.guild.id] = null
+      if (!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
+        playNextSong(msg)
+      } else if (isQueueEmpty(msg.guild.id)) {
+        channelToSendInfo[msg.guild.id].send(
+          {
+            'embed': {
+              'color': 2645853,
+              'author': {
+                'name': 'Shadow player',
+                'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
+              },
+              'fields': [
+                {
+                  'name': 'Info',
+                  'value': 'No more songs in the queue'
+                }
+              ]
+            }
           }
-        }
-      )
+        )
+      }
     }
   })
 
   queue[msg.guild.id].splice(0, 1)
-  Logger.debug("queueLength: " + queue[msg.guild.id].length)
+  Logger.debug('queueLength: ' + queue[msg.guild.id].length)
+}
+
+function playSong (guildId) {
+  return new Promise((resolve, reject) => {
+    musicStream[guildId] = voiceConnection[guildId].playStream(
+      ytdl('https://www.youtube.com/watch?v=' + nowPlaying[guildId].id, {filter: 'audioonly'}),
+      {
+        volume: (actualVolume[guildId] / 100)
+      }
+    )
+    resolve()
+  })
 }
 
 function isBotPlaying (guildId) {
