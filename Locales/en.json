@@ -6,5 +6,10 @@
 	"not_in_a_voice_channel": "I'm not in a voice channel.",
 	"Volume: %i %": "Volume: %i %",
 	"volume_parameter_info": "Volume must be between 0 and 100",
-	"locale_changed_to": "Language set to english."
+	"locale_changed_to": "Language set to english.",
+	"perm_no_operation_specified": "No operation specified.",
+	"perm_no_permission_specified": "No permission specified",
+	"perm_add_already_have": "This user already have that permission.",
+	"perm_add_successfull": "Permission added successfully",
+	"perm_remove_successfull": "Permission removed succesfully"
 }

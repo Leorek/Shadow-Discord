@@ -9,7 +9,7 @@ Shadow is a Discord bot intended to be easy to use and customizable. Written in 
 * **Wiki** (Currently in development)
 
 # Pre-requisites
-* [NodeJS](https://nodejs.org/es/) 6.11.2 or superior.
+* [NodeJS](https://nodejs.org/es/) 8.0.0 or superior.
 * [Node-opus](https://github.com/Rantanen/node-opus) for music module.
 
 # Installation
