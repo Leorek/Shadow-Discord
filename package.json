@@ -38,6 +38,7 @@
     "require-directory": "^2.1.1",
     "uws": "^8.14.1",
     "wtf_wikipedia": "^1.0.1",
+    "youtube-dl": "^1.11.1",
     "ytdl-core": "^0.17.0"
   },
   "devDependencies": {

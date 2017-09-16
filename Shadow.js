@@ -39,7 +39,7 @@ Client.on('message', msg => {
     try {
       UserCenter.userHasPermissions(msg.author, CommandCenter.Commands[command]).then(hasPermissions => {
         if (hasPermissions) {
-          CommandCenter.Commands[command].fn(msg, suffix, Lang)
+          CommandCenter.Commands[command].fn(msg, suffix, Lang, Client)
         } else {
           msg.reply("You don't have permissions to execute this command.")
         }

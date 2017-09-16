@@ -1,44 +1,23 @@
-var ytdl = require('ytdl-core')
-var Request = require('request')
-var Config = require('../../config.json')
+const YoutubeDL = require('youtube-dl')
+const ytdl = require('ytdl-core')
+const Config = require('../../config.json')
 const Logger = require('../Logger.js').Logger
+var client = null
 
-// Handlers
-var channelToSendInfo = []
-var voiceConnection = []
-var musicStream = []
+let MAX_QUEUE_SIZE = (Config.music && Config.music.maxQueueSize) || 20
+let DEFAULT_VOLUME = (Config.music && Config.music.volume) || 50
 
-var actualVolume = []
-var isPaused = []
-var queue = []
-var nowPlaying = []
-var timeout = 1500
-var timeoutObj
+let queues = {}
 
 var Commands = []
 
-Commands.join = {
-  name: 'join',
-  help: 'Makes Shadow to join a voice channel.',
+Commands.play = {
+  name: 'play',
+  help: 'Searchs a song on youtube and adds it to the queue.',
   permissions: ['member'],
-  fn: function (msg, suffix, lang) {
-    if (!msg.guild) return
-    channelToSendInfo[msg.guild.id] = msg.guild.channels.find(chn => chn.name === 'general' && chn.type === 'text')
-    if (channelToSendInfo[msg.guild.id] === null) throw new Error("Couldn't find text channel '#" + 'general' + "' in server.")
-    if (msg.member.voiceChannel !== undefined) {
-      msg.member.voiceChannel.join()
-        .then(connection => {
-          msg.reply(lang.__('join_voice_channel_success'))
-          voiceConnection[msg.guild.id] = connection
-          queue[msg.guild.id] = []
-          actualVolume[msg.guild.id] = 100
-          isPaused[msg.guild.id] = false
-          nowPlaying[msg.guild.id] = null
-        })
-        .catch(console.log)
-    } else {
-      msg.reply(lang.__('not_in_a_voice_channel'))
-    }
+  fn: function (msg, suffix, lang, Client) {
+    client = Client
+    play(msg, suffix, lang)
   }
 }
 
@@ -47,20 +26,7 @@ Commands.leave = {
   help: 'Makes Shadow to leave actual voice channel.',
   permissions: ['member'],
   fn: function (msg, suffix, lang) {
-    leaveVoiceChannel(msg, lang)
-  }
-}
-
-Commands.request = {
-  name: 'request',
-  help: 'Searchs a song on youtube and adds it to the queue.',
-  permissions: ['member'],
-  fn: function (msg, suffix, lang) {
-    if (voiceConnection[msg.guild.id] !== null) {
-      searchVideo(msg, suffix, lang)
-    } else {
-      msg.reply(lang.__('not_in_a_voice_channel'))
-    }
+    leave(msg, lang)
   }
 }
 
@@ -69,34 +35,7 @@ Commands.volume = {
   help: 'Sets volume or returns actual one if no suffix specified.',
   permissions: ['member'],
   fn: function (msg, suffix, lang, bot) {
-    var newVolume = parseInt(suffix)
-    if (Number.isInteger(newVolume)) {
-      if (newVolume >= 0 && newVolume <= 100) {
-        actualVolume[msg.guild.id] = newVolume
-        if (isBotPlaying(msg.guild.id)) {
-          musicStream[msg.guild.id].setVolume(actualVolume[msg.guild.id] / 100)
-        }
-      } else {
-        msg.reply(lang.__('volume_parameter_info'))
-      }
-    }
-    msg.channel.send(
-      {
-        'embed': {
-          'color': 2645853,
-          'author': {
-            'name': 'Shadow player',
-            'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-          },
-          'fields': [
-            {
-              'name': 'Info',
-              'value': lang.__('Volume: %i %', actualVolume[msg.guild.id])
-            }
-          ]
-        }
-      }
-    )
+    volume(msg, suffix)
   }
 }
 
@@ -104,18 +43,8 @@ Commands.pause = {
   name: 'pause',
   help: 'Pauses the actual song.',
   permissions: ['member'],
-  fn: function (msg, suffix) {
-    if (musicStream[msg.guild.id] !== undefined) {
-      if (!isPaused[msg.guild.id]) {
-        msg.reply('Pausing player.')
-        isPaused[msg.guild.id] = true
-        musicStream[msg.guild.id].pause()
-      } else {
-        msg.reply('The player is already paused.')
-      }
-    } else {
-      msg.reply('The player is not playing anything.')
-    }
+  fn: function (msg, suffix, lang) {
+    pause(msg, suffix)
   }
 }
 
@@ -124,13 +53,7 @@ Commands.resume = {
   help: 'Resumes the actual song.',
   permissions: ['member'],
   fn: function (msg, suffix) {
-    if (isPaused[msg.guild.id]) {
-      msg.reply('Resuming player.')
-      isPaused[msg.guild.id] = false
-      musicStream[msg.guild.id].resume()
-    } else {
-      msg.reply('The player is not paused.')
-    }
+    resume(msg, suffix)
   }
 }
 
@@ -138,17 +61,8 @@ Commands.skip = {
   name: 'skip',
   help: 'Skips the actual song.',
   permissions: ['member'],
-  fn: function (msg, suffix) {
-    if (voiceConnection[msg.guild.id]) {
-      if (isBotPlaying(msg.guild.id)) {
-        msg.reply('Skipping...')
-        musicStream[msg.guild.id].end('skip')
-      } else {
-        msg.reply('There is nothing being played.')
-      }
-    } else {
-      msg.reply("I'm not in a voice channel.")
-    }
+  fn: function (msg, suffix, lang) {
+    skip(msg, suffix, lang)
   }
 }
 
@@ -157,220 +71,231 @@ Commands.queue = {
   help: 'Shows the actual queue.',
   permissions: ['member'],
   fn: function (msg, suffix) {
-    if (queue[msg.guild.id] !== undefined) {
-      if (!isQueueEmpty(msg.guild.id)) {
-        var queueItems = []
-        for (var i = 0; i < queue[msg.guild.id].length; i++) {
-          queueItems.push('"' + queue[msg.guild.id][i].title + '" requested by ' + queue[msg.guild.id][i].user)
-        }
-
-        msg.channel.send(
-          {
-            'embed': {
-              'color': 2645853,
-              'author': {
-                'name': 'Shadow player',
-                'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-              },
-              'fields': [
-                {
-                  'name': 'Now Playing',
-                  'value': '"' + nowPlaying[msg.guild.id].title + '" requested by ' + nowPlaying[msg.guild.id].user
-                },
-                {
-                  'name': 'Queue',
-                  'value': queueItems.join(' \n ')
-                }
-              ]
-            }
-          }
-        )
-      } else {
-        msg.channel.send(
-          {
-            'embed': {
-              'color': 2645853,
-              'author': {
-                'name': 'Shadow player',
-                'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-              },
-              'fields': [
-                {
-                  'name': 'Info',
-                  'value': 'The queue is empty.'
-                }
-              ]
-            }
-          }
-        )
-      }
-    } else {
-      msg.reply("I'm not connected to a voice channel.")
-    }
+    queue(msg, suffix)
   }
 }
 
-function searchVideo (msg, query, lang) {
-  Request('https://www.googleapis.com/youtube/v3/search?part=id&type=video&q=' + encodeURIComponent(query) + '&key=' + Config.apiKeys.youtube, (err, response, body) => {
-    if (err) {
-      console.log(err)
-    }
-    var json = JSON.parse(body)
-    if ('error' in json) {
-      msg.reply('An error has occurred: ' + json.error.errors[0].msg + ' - ' + json.error.errors[0].reason)
-    } else if (json.items.length === 0) {
-      msg.reply('No videos found matching the search criteria.')
-    } else {
-      addToQueue(json.items[0].id.videoId, msg, lang)
-    }
-  })
-}
-
-function addToQueue (video, msg, lang) {
-  var videoId = getVideoId(video)
-
-  ytdl.getInfo('https://www.youtube.com/watch?v=' + videoId, (error, info) => {
-    var msgInfo = ''
-    if (error) {
-      msgInfo = 'The requested video (' + videoId + ') does not exist or cannot be played.'
-    } else {
-      queue[msg.guild.id].push({title: info['title'], id: videoId, user: msg.author.username})
-      msgInfo = '"' + info['title'] + '" has been added to the queue.'
-      Logger.debug('isPaused: ' + isPaused[msg.guild.id] + ' isBotPlaying: ' + isBotPlaying(msg.guild.id) + ' queueLength: ' + queue[msg.guild.id].length)
-      if (!isPaused[msg.guild.id] && !isBotPlaying(msg.guild.id) && queue[msg.guild.id].length === 1) {
-        Logger.debug("Let's play this song")
-        if (timeoutObj !== undefined) {
-          Logger.debug('There was a timeout set, clearing it.')
-          clearTimeout(timeoutObj)
-          timeoutObj = undefined
-        }
-        playNextSong(msg, lang)
-      }
-    }
-    msg.channel.send(
-      {
-        'embed': {
-          'color': 2645853,
-          'author': {
-            'name': 'Shadow player',
-            'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-          },
-          'fields': [
-            {
-              'name': 'Info',
-              'value': msgInfo
-            }
-          ]
-        }
-      }
-    )
-  })
-}
-
-function getVideoId (string) {
-  var regex = /(?:\?v=|&v=|youtu\.be\/)(.*?)(?:\?|&|$)/
-  var matches = string.match(regex)
-
-  if (matches) {
-    return matches[1]
-  } else {
-    return string
+Commands.clearqueue = {
+  name: 'clearqueue',
+  help: 'Clears the actual queue.',
+  permissions: ['member'],
+  fn: function (msg, suffix) {
+    clearqueue(msg, suffix)
   }
 }
 
-function playNextSong (msg, lang) {
-  var videoId = queue[msg.guild.id][0]['id']
-  var title = queue[msg.guild.id][0]['title']
-  var user = queue[msg.guild.id][0]['user']
+function play (msg, suffix, lang) {
+  if (msg.member.voiceChannel === undefined) return msg.channel.send(format(lang.__('music_not_in_voice_channel')))
 
-  nowPlaying[msg.guild.id] = {}
-  nowPlaying[msg.guild.id].title = title
-  nowPlaying[msg.guild.id].user = user
-  nowPlaying[msg.guild.id].id = videoId
+  if (!suffix) return msg.channel.send(format(lang.__('music_nothing_specified')))
 
-  Logger.info('NowPlaying: ' + nowPlaying[msg.guild.id].title)
+  const queue = getQueue(msg.guild.id)
 
-  channelToSendInfo[msg.guild.id].send(
-    {
-      'embed': {
-        'color': 2645853,
-        'author': {
-          'name': 'Shadow player',
-          'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-        },
-        'fields': [
-          {
-            'name': 'Now Playing',
-            'value': '"' + title + '" requested by ' + user
-          }
-        ]
+  if (queue.length >= MAX_QUEUE_SIZE) {
+    return msg.channel.send(format(lang.__('music_max_queue_size_reached')))
+  }
+
+  msg.channel.send(format(lang.__('music_searching'))).then(response => {
+    var searchstring = suffix
+    if (!suffix.toLowerCase().startsWith('http')) {
+      searchstring = 'gvsearch1:' + suffix
+    }
+
+    YoutubeDL.getInfo(searchstring, ['-q', '--no-warnings', '--force-ipv4'], (err, info) => {
+      if (err || info.format_id === undefined || info.format_id.startsWith('0')) {
+        return response.edit(format(lang.__('music_invalid_video')))
       }
-    }
-  )
-  musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(
-    ytdl('https://www.youtube.com/watch?v=' + nowPlaying[msg.guild.id].id, {filter: 'audioonly'}),
-    {
-      volume: (actualVolume[msg.guild.id] / 100)
-    }
-  )
 
-  musicStream[msg.guild.id].once('end', reason => {
-    Logger.debug(nowPlaying[msg.guild.id].title + ' ended because ' + reason)
-    if (reason === undefined) {
-      Logger.debug('This song ended prematurely, replaying.')
-      musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(
-        ytdl('https://www.youtube.com/watch?v=' + nowPlaying[msg.guild.id].id, {filter: 'audioonly'}),
+      info.requester = msg.author.id
+
+      response.edit(format(lang.__('music_queued') + info.title)).then(() => {
+        queue.push(info)
+        if (queue.length === 1) executeQueue(msg, queue)
+      }).catch(Logger.error)
+    })
+  }).catch(Logger.error)
+}
+
+function leave (msg, suffix, lang) {
+  const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+  if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_in_channel')))
+
+  const queue = getQueue(msg.guild.id)
+  queue.splice(0, queue.length)
+
+  voiceConnection.player.dispatcher.end()
+  voiceConnection.disconnect()
+}
+
+function skip (msg, suffix, lang) {
+  const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+  if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_playing')))
+
+  const queue = getQueue(msg.guild.id)
+
+  let toSkip = 1
+  if (!isNaN(suffix) && parseInt(suffix) > 0) {
+    toSkip = parseInt(suffix)
+  }
+  toSkip = Math.min(toSkip, queue.length)
+
+  queue.splice(0, toSkip - 1)
+
+  const dispatcher = voiceConnection.player.dispatcher
+  if (voiceConnection.paused) dispatcher.resume()
+  dispatcher.end()
+
+  msg.channel.send(format(lang.__('music_skipped_songs')))
+}
+
+function pause (msg, suffix, lang) {
+  const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+  if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_playing')))
+
+  msg.channel.send(format('Playback paused.'))
+  const dispatcher = voiceConnection.player.dispatcher
+  if (!dispatcher.paused) dispatcher.pause()
+}
+
+function resume (msg, suffix, lang) {
+  const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+  if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_playing')))
+
+  msg.channel.send(format('Playback resumed.'))
+  const dispatcher = voiceConnection.player.dispatcher
+  if (dispatcher.paused) dispatcher.resume()
+}
+
+function volume (msg, suffix, lang) {
+  const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+  if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_playing')))
+
+  const dispatcher = voiceConnection.player.dispatcher
+
+  if (suffix > 200 || suffix < 0) {
+    return msg.channel.send(format(lang.__('music_volume_not_valid'))).then((response) => {
+      response.delete(5000)
+    })
+  }
+
+  msg.channel.send(format('Volume set to ' + suffix))
+  dispatcher.setVolume((suffix / 100))
+}
+
+function queue (msg, suffix, lang) {
+  const queue = getQueue(msg.guild.id)
+
+  const list = queue.map((video, index) => ((index + 1) + ': ' + video.title)).join('\n')
+
+  msg.channel.send({
+    'embed': {
+      'color': 2645853,
+      'author': {
+        'name': 'Shadow player',
+        'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
+      },
+      'fields': [
         {
-          volume: (actualVolume[msg.guild.id] / 100)
+          'name': lang.__('music_now_playing'),
+          'value': 'TODO'
+        },
+        {
+          'name': 'Queue',
+          'value': list
         }
-      )
-    } else {
-      nowPlaying[msg.guild.id] = null
-      if (!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
-        playNextSong(msg, lang)
-      } else if (isQueueEmpty(msg.guild.id)) {
-        timeoutObj = setTimeout(leaveVoiceChannel, timeout, msg, lang)
-        channelToSendInfo[msg.guild.id].send(
-          {
-            'embed': {
-              'color': 2645853,
-              'author': {
-                'name': 'Shadow player',
-                'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
-              },
-              'fields': [
-                {
-                  'name': 'Info',
-                  'value': 'No more songs in the queue'
-                }
-              ]
-            }
-          }
-        )
-      }
+      ]
     }
   })
-
-  queue[msg.guild.id].splice(0, 1)
-  Logger.debug('queueLength: ' + queue[msg.guild.id].length)
 }
 
-function leaveVoiceChannel (msg, lang) {
-  if (voiceConnection[msg.guild.id] !== undefined) {
-    msg.reply(lang.__('leave_voice_channel'))
-    voiceConnection[msg.guild.id].channel.leave()
-    queue[msg.guild.id] = undefined
-  } else {
-    msg.reply(lang.__('not_in_a_voice_channel'))
+function clearqueue (msg, suffix, lang) {
+  const queue = getQueue(msg.guild.id)
+
+  queue.splice(0, queue.length)
+  msg.channel.send(format(lang.__('music_queue_cleared')))
+}
+
+function executeQueue (msg, queue) {
+  if (queue.length === 0) {
+    msg.channel.send(format('Playback finished.'))
+
+    const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+    if (voiceConnection !== null) return voiceConnection.disconnect()
   }
+
+  new Promise((resolve, reject) => {
+    const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+    if (voiceConnection === null) {
+      if (msg.member.voiceChannel) {
+        msg.member.voiceChannel.join().then(connection => {
+          resolve(connection)
+        }).catch((error) => {
+          Logger.error(error)
+        })
+      } else {
+        queue.splice(0, queue.length)
+        reject(new Error('User not in a voice channel'))
+      }
+    } else {
+      resolve(voiceConnection)
+    }
+  }).then(connection => {
+    const video = queue[0]
+
+    Logger.debug(video.webpage_url)
+
+    msg.channel.send(format('Now Playing: ' + video.title)).then(() => {
+      let dispatcher = connection.playStream(ytdl(video.webpage_url, {filter: 'audioonly'}), {seek: 0, volume: (DEFAULT_VOLUME / 100)})
+
+      connection.on('error', (error) => {
+        Logger.error(error)
+        queue.shift()
+        executeQueue(msg, queue)
+      })
+
+      dispatcher.on('error', (error) => {
+        Logger.debug(error)
+        queue.shift()
+        executeQueue(msg, queue)
+      })
+
+      dispatcher.on('end', () => {
+        setTimeout(() => {
+          if (queue.length > 0) {
+            queue.shift()
+            executeQueue(msg, queue)
+          }
+        }, 1000)
+      })
+    }).catch((error) => {
+      Logger.error(error)
+    })
+  }).catch((error) => {
+    Logger.error(error)
+  })
 }
 
-function isBotPlaying (guildId) {
-  return nowPlaying[guildId] !== null
+function getQueue (server) {
+  if (!queues[server]) queues[server] = []
+  return queues[server]
 }
 
-function isQueueEmpty (guildId) {
-  return queue[guildId].length === 0
+function format (info) {
+  return {
+    'embed': {
+      'color': 2645853,
+      'author': {
+        'name': 'Shadow player',
+        'icon_url': 'http://icons.iconarchive.com/icons/dtafalonso/yosemite-flat/512/Music-icon.png'
+      },
+      'fields': [
+        {
+          'name': 'Info',
+          'value': info
+        }
+      ]
+    }
+  }
 }
 
 exports.Commands = Commands
