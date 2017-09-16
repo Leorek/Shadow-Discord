@@ -307,17 +307,22 @@ function playNextSong (msg, lang) {
       }
     }
   )
+<<<<<<< HEAD
   musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(
     ytdl('https://www.youtube.com/watch?v=' + nowPlaying[msg.guild.id].id, {filter: 'audioonly'}),
     {
       volume: (actualVolume[msg.guild.id] / 100)
     }
   )
+=======
+  playSong(msg.guild.id)
+>>>>>>> 1add4ef46ef28fbe96304452bd6d773b10052665
 
   musicStream[msg.guild.id].once('end', reason => {
     Logger.debug(nowPlaying[msg.guild.id].title + ' ended because ' + reason)
     if (reason === undefined) {
       Logger.debug('This song ended prematurely, replaying.')
+<<<<<<< HEAD
       musicStream[msg.guild.id] = voiceConnection[msg.guild.id].playStream(
         ytdl('https://www.youtube.com/watch?v=' + nowPlaying[msg.guild.id].id, {filter: 'audioonly'}),
         {
@@ -330,6 +335,14 @@ function playNextSong (msg, lang) {
         playNextSong(msg, lang)
       } else if (isQueueEmpty(msg.guild.id)) {
         timeoutObj = setTimeout(leaveVoiceChannel, timeout, msg, lang)
+=======
+      playSong(msg.guild.id)
+    } else {
+      nowPlaying[msg.guild.id] = null
+      if (!isPaused[msg.guild.id] && !isQueueEmpty(msg.guild.id)) {
+        playNextSong(msg)
+      } else if (isQueueEmpty(msg.guild.id)) {
+>>>>>>> 1add4ef46ef28fbe96304452bd6d773b10052665
         channelToSendInfo[msg.guild.id].send(
           {
             'embed': {
@@ -355,6 +368,7 @@ function playNextSong (msg, lang) {
   Logger.debug('queueLength: ' + queue[msg.guild.id].length)
 }
 
+<<<<<<< HEAD
 function leaveVoiceChannel (msg, lang) {
   if (voiceConnection[msg.guild.id] !== undefined) {
     msg.reply(lang.__('leave_voice_channel'))
@@ -363,6 +377,18 @@ function leaveVoiceChannel (msg, lang) {
   } else {
     msg.reply(lang.__('not_in_a_voice_channel'))
   }
+=======
+function playSong (guildId) {
+  return new Promise((resolve, reject) => {
+    musicStream[guildId] = voiceConnection[guildId].playStream(
+      ytdl('https://www.youtube.com/watch?v=' + nowPlaying[guildId].id, {filter: 'audioonly'}),
+      {
+        volume: (actualVolume[guildId] / 100)
+      }
+    )
+    resolve()
+  })
+>>>>>>> 1add4ef46ef28fbe96304452bd6d773b10052665
 }
 
 function isBotPlaying (guildId) {
