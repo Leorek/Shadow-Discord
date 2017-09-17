@@ -112,7 +112,7 @@ function play (msg, suffix, lang) {
 
       response.edit(format(lang.__('music_queued') + info.title)).then(() => {
         queue.push(info)
-        if (queue.length === 1) executeQueue(msg, queue)
+        if (queue.length === 1) executeQueue(msg, queue, lang)
       }).catch(Logger.error)
     })
   }).catch(Logger.error)

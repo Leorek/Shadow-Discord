@@ -10,5 +10,6 @@
 	"music_queued": "Queued: ",
 	"music_skipped_songs": "Songs skipped",
 	"something_went_wrong": "Something went wrong.",
-	"dog_breed_not_found": "Dog breed not found."
+	"dog_breed_not_found": "Dog breed not found.",
+	"music_now_playing": "music_now_playing"
 }
