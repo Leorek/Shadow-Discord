@@ -1,7 +1,10 @@
-const YoutubeDL = require('youtube-dl')
+var Google = require('googleapis')
+var Youtube = Google.youtube('v3')
 const ytdl = require('ytdl-core')
 const Config = require('../../config.json')
 const Logger = require('../Logger.js').Logger
+
+Google.options({ auth: Config.apiKeys.youtube })
 var client = null
 
 let MAX_QUEUE_SIZE = (Config.music && Config.music.maxQueueSize) || 20
@@ -28,7 +31,7 @@ Commands.leave = {
   help: 'Makes Shadow to leave actual voice channel.',
   permissions: ['member'],
   fn: function (msg, suffix, lang) {
-    leave(msg, lang)
+    leave(msg, suffix, lang)
   }
 }
 
@@ -37,7 +40,7 @@ Commands.volume = {
   help: 'Sets volume or returns actual one if no suffix specified.',
   permissions: ['member'],
   fn: function (msg, suffix, lang, bot) {
-    volume(msg, suffix)
+    volume(msg, suffix, lang)
   }
 }
 
@@ -46,7 +49,7 @@ Commands.pause = {
   help: 'Pauses the actual song.',
   permissions: ['member'],
   fn: function (msg, suffix, lang) {
-    pause(msg, suffix)
+    pause(msg, suffix, lang)
   }
 }
 
@@ -54,8 +57,8 @@ Commands.resume = {
   name: 'resume',
   help: 'Resumes the actual song.',
   permissions: ['member'],
-  fn: function (msg, suffix) {
-    resume(msg, suffix)
+  fn: function (msg, suffix, lang) {
+    resume(msg, suffix, lang)
   }
 }
 
@@ -72,8 +75,8 @@ Commands.queue = {
   name: 'queue',
   help: 'Shows the actual queue.',
   permissions: ['member'],
-  fn: function (msg, suffix) {
-    queue(msg, suffix)
+  fn: function (msg, suffix, lang) {
+    queue(msg, suffix, lang)
   }
 }
 
@@ -81,14 +84,14 @@ Commands.clearqueue = {
   name: 'clearqueue',
   help: 'Clears the actual queue.',
   permissions: ['member'],
-  fn: function (msg, suffix) {
-    clearqueue(msg, suffix)
+  fn: function (msg, suffix, lang) {
+    clearqueue(msg, suffix, lang)
   }
 }
 
 function play (msg, suffix, lang) {
   if (msg.member.voiceChannel === undefined) return msg.channel.send(format(lang.__('music_not_in_voice_channel')))
-
+  Logger.debug('This is the suffix ' + suffix)
   if (!suffix) return msg.channel.send(format(lang.__('music_nothing_specified')))
 
   const queue = getQueue(msg.guild.id)
@@ -98,23 +101,29 @@ function play (msg, suffix, lang) {
   }
 
   msg.channel.send(format(lang.__('music_searching'))).then(response => {
-    var searchstring = suffix
-    if (!suffix.toLowerCase().startsWith('http')) {
-      searchstring = 'gvsearch1:' + suffix
+    if (Config.apiKeys.youtube) {
+      Youtube.search.list({
+        part: 'snippet',
+        q: suffix
+      }, function (err, apiResponse) {
+        if (err) {
+          Logger.error('The API returned an error: ' + err)
+          return
+        }
+        var searchResults = apiResponse.items
+        if (searchResults.length === 0) {
+          Logger.debug('No videos found.')
+        } else {
+          var video = searchResults[0]
+
+          video.requester = msg.author.id
+          response.edit(format(lang.__('music_queued') + video.snippet.title)).then(() => {
+            queue.push(video)
+            if (queue.length === 1) executeQueue(msg, queue, lang)
+          }).catch(Logger.error)
+        }
+      })
     }
-
-    YoutubeDL.getInfo(searchstring, ['-q', '--no-warnings', '--force-ipv4'], (err, info) => {
-      if (err || info.format_id === undefined || info.format_id.startsWith('0')) {
-        return response.edit(format(lang.__('music_invalid_video')))
-      }
-
-      info.requester = msg.author.id
-
-      response.edit(format(lang.__('music_queued') + info.title)).then(() => {
-        queue.push(info)
-        if (queue.length === 1) executeQueue(msg, queue, lang)
-      }).catch(Logger.error)
-    })
   }).catch(Logger.error)
 }
 
@@ -187,7 +196,7 @@ function volume (msg, suffix, lang) {
 function queue (msg, suffix, lang) {
   const queue = getQueue(msg.guild.id)
 
-  const list = queue.map((video, index) => ((index + 1) + ': ' + video.title)).join('\n')
+  const list = queue.map((video, index) => ((index + 1) + ': ' + video.snippet.title)).join('\n')
 
   msg.channel.send({
     'embed': {
@@ -251,26 +260,26 @@ function executeQueue (msg, queue, lang) {
 
     Logger.debug(video.webpage_url)
 
-    msg.channel.send(format(lang.__('music_now_playing') + video.title)).then(() => {
-      let dispatcher = connection.playStream(ytdl(video.webpage_url, {filter: 'audioonly'}), {seek: 0, volume: (DEFAULT_VOLUME / 100)})
+    msg.channel.send(format(lang.__('music_now_playing') + video.snippet.title)).then(() => {
+      let dispatcher = connection.playStream(ytdl('https://www.youtube.com/watch?v=' + video.id.videoId, {filter: 'audioonly'}), {seek: 0, volume: (DEFAULT_VOLUME / 100)})
 
       connection.on('error', (error) => {
         Logger.error(error)
         queue.shift()
-        executeQueue(msg, queue)
+        executeQueue(msg, queue, lang)
       })
 
       dispatcher.on('error', (error) => {
         Logger.debug(error)
         queue.shift()
-        executeQueue(msg, queue)
+        executeQueue(msg, queue, lang)
       })
 
       dispatcher.on('end', () => {
         setTimeout(() => {
           if (queue.length > 0) {
             queue.shift()
-            executeQueue(msg, queue)
+            executeQueue(msg, queue, lang)
           }
         }, 1000)
       })
