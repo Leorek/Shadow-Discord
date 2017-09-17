@@ -7,6 +7,7 @@ Shadow is a Discord bot intended to be easy to use and customizable. Written in 
 * **League of Legends info** (Currently in development)
 * **Util commands**
 * **Wiki** (Currently in development)
+* **Multilanguage**
 
 # Pre-requisites
 * [NodeJS](https://nodejs.org/es/) 8.0.0 or superior.

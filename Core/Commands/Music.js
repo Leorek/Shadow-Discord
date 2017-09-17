@@ -5,9 +5,11 @@ const Logger = require('../Logger.js').Logger
 var client = null
 
 let MAX_QUEUE_SIZE = (Config.music && Config.music.maxQueueSize) || 20
+let TIMEOUT = (Config.music && Config.music.timeout) || 180000
 let DEFAULT_VOLUME = (Config.music && Config.music.volume) || 50
 
 let queues = {}
+let queueTimeout = null
 
 var Commands = []
 
@@ -152,7 +154,7 @@ function pause (msg, suffix, lang) {
   const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
   if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_playing')))
 
-  msg.channel.send(format('Playback paused.'))
+  msg.channel.send(format(lang.__('music_paused')))
   const dispatcher = voiceConnection.player.dispatcher
   if (!dispatcher.paused) dispatcher.pause()
 }
@@ -161,7 +163,7 @@ function resume (msg, suffix, lang) {
   const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
   if (voiceConnection === null) return msg.channel.send(format(lang.__('music_not_playing')))
 
-  msg.channel.send(format('Playback resumed.'))
+  msg.channel.send(format(lang.__('music_resumed')))
   const dispatcher = voiceConnection.player.dispatcher
   if (dispatcher.paused) dispatcher.resume()
 }
@@ -215,12 +217,17 @@ function clearqueue (msg, suffix, lang) {
   msg.channel.send(format(lang.__('music_queue_cleared')))
 }
 
-function executeQueue (msg, queue) {
+function executeQueue (msg, queue, lang) {
   if (queue.length === 0) {
-    msg.channel.send(format('Playback finished.'))
+    msg.channel.send(format(lang.__('music_queue_finished')))
 
-    const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
-    if (voiceConnection !== null) return voiceConnection.disconnect()
+    queueTimeout = setTimeout(() => {
+      const voiceConnection = client.voiceConnections.find(val => val.channel.guild.id === msg.guild.id)
+      if (voiceConnection !== null) return voiceConnection.disconnect()
+    }, TIMEOUT)
+  } else if (queueTimeout !== null) {
+    clearTimeout(queueTimeout)
+    queueTimeout = null
   }
 
   new Promise((resolve, reject) => {
@@ -234,7 +241,7 @@ function executeQueue (msg, queue) {
         })
       } else {
         queue.splice(0, queue.length)
-        reject(new Error('User not in a voice channel'))
+        reject(new Error(lang.__('music_not_in_voice_channel')))
       }
     } else {
       resolve(voiceConnection)
@@ -244,7 +251,7 @@ function executeQueue (msg, queue) {
 
     Logger.debug(video.webpage_url)
 
-    msg.channel.send(format('Now Playing: ' + video.title)).then(() => {
+    msg.channel.send(format(lang.__('music_now_playing') + video.title)).then(() => {
       let dispatcher = connection.playStream(ytdl(video.webpage_url, {filter: 'audioonly'}), {seek: 0, volume: (DEFAULT_VOLUME / 100)})
 
       connection.on('error', (error) => {
