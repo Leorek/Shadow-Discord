@@ -11,8 +11,8 @@
 	"music_skipped_songs": "Songs skipped",
 	"something_went_wrong": "Something went wrong.",
 	"dog_breed_not_found": "Dog breed not found.",
-	"music_now_playing": "music_now_playing",
-	"music_paused": "music_paused",
-	"music_resumed": "music_resumed",
-	"music_queue_cleared": "music_queue_cleared"
+	"music_now_playing": "Now playing: ",
+	"music_paused": "Player paused.",
+	"music_resumed": "Player resumed.",
+	"music_queue_cleared": "Queue cleared"
 }

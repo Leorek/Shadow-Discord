@@ -10,6 +10,14 @@ var CommandCenter = require('./Core/CommandCenter.js')
 var UserCenter = require('./Core/UserCenter.js')
 let prefix = Config.settings.prefix
 
+if (Config.settings.language) {
+  if (Lang.getLocales().indexOf(Config.settings.language.trim()) > -1) {
+    Lang.setLocale(Config.settings.language.trim())
+  } else {
+    Logger.info('Language not found, setting default language: en')
+  }
+}
+
 Client.on('ready', () => {
   Logger.info('Shadow is up and ready.')
   /*

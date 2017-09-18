@@ -17,10 +17,7 @@ Commands.test = {
   help: "I'll test whatever you want!",
   permissions: ['member'],
   fn: function (msg, suffix, lang) {
-    msg.reply(lang.__('hello'))
-    lang.setLocale('es')
-    msg.reply(lang.__('hello'))
-    lang.setLocale('en')
+    msg.reply('Test!')
   }
 }
 

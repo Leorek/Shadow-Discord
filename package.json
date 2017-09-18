@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/Leorek/Shadow-Discord#readme",
   "dependencies": {
+    "bluebird": "^3.5.0",
     "bunyan": "^1.8.12",
     "discord.js": "^11.1.0",
     "erlpack": "github:hammerandchisel/erlpack",
