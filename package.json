@@ -4,17 +4,14 @@
   "description": "Yet another discord bot.",
   "main": "Shadow.js",
   "scripts": {
-    "start": "node Shadow.js",
-    "test": "standard --verbose | snazzy && node Shadow.js"
+    "start": "npm run build-ts && node dist/server.js",
+    "build-ts": "tsc"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Leorek/Shadow-Discord.git"
   },
-  "keywords": [
-    "shadow",
-    "discord"
-  ],
+  "keywords": ["shadow", "discord"],
   "engines": {
     "node": "^8.0.0",
     "npm": "^5.3.0"
@@ -26,6 +23,7 @@
   },
   "homepage": "https://github.com/Leorek/Shadow-Discord#readme",
   "dependencies": {
+    "@types/node": "^8.5.7",
     "bluebird": "^3.5.0",
     "bunyan": "^1.8.12",
     "discord.js": "^11.1.0",
@@ -38,6 +36,8 @@
     "node-opus": "^0.2.7",
     "nodemw": "^0.10.1",
     "require-directory": "^2.1.1",
+    "telegraf": "^3.17.3",
+    "typescript": "^2.6.2",
     "uws": "^8.14.1",
     "wtf_wikipedia": "^1.0.1",
     "ytdl-core": "^0.17.0"
