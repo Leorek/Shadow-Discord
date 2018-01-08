@@ -9,7 +9,15 @@ class TelegramController {
             console.log("started:", ctx.from.id);
             return ctx.reply("Welcome!");
         });
+        this.registerCommands();
         this.bot.startPolling();
+    }
+    registerCommands() {
+        for (let group in this.commands) {
+            console.log("Group: ");
+            console.log(group);
+            this.bot.command(this.commands[group].name, ctx => this.commands[group].execute("telegram", ctx));
+        }
     }
 }
 exports.default = TelegramController;

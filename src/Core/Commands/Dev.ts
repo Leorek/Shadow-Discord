@@ -6,21 +6,19 @@ class DevCommand {
   public permissions = ["member"];
   public platforms = ["discord"];
 
-  public execute(platform, msg) {
-    console.log("Executing " + this.name);
-    console.log("Platform: " + platform);
+  public execute(platform, ctx) {
     switch (platform) {
       case "discord":
-        this.discord(msg);
+        this.discord(ctx);
         break;
     }
   }
-  private discord(msg) {
-    var initTime = new Date(msg.timestamp).valueOf();
-    msg.reply("Pong!").then(m => {
+  private discord(ctx) {
+    var initTime = new Date(ctx.timestamp).valueOf();
+    ctx.reply("Pong!").then(m => {
       m.edit(
         "<@" +
-          msg.author.id +
+          ctx.author.id +
           ">, Pong! Time taken: " +
           Math.floor(new Date(m.timestamp).valueOf() - initTime) +
           " ms."
@@ -35,22 +33,22 @@ class TestCommand {
   public permissions = ["member"];
   public platforms = ["telegram"];
 
-  execute(platform, msg, suffix, lang) {
+  execute(platform, ctx, suffix, lang) {
     switch (platform) {
       case "discord":
-        this.discord(msg, suffix, lang);
+        this.discord(ctx, suffix, lang);
         break;
       case "telegram":
-        this.telegram(msg, suffix, lang);
+        this.telegram(ctx, suffix, lang);
         break;
     }
   }
 
-  discord(msg, suffix, lang) {
-    msg.reply("Test!");
+  discord(ctx, suffix, lang) {
+    ctx.reply("Test!");
   }
-  telegram(msg, suffix, lang) {
-    msg.reply("Test!");
+  telegram(ctx, suffix, lang) {
+    ctx.reply("Test!");
   }
 }
 

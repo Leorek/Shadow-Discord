@@ -35,21 +35,21 @@ class TestCommand {
         this.permissions = ["member"];
         this.platforms = ["telegram"];
     }
-    execute(platform, msg, suffix, lang) {
+    execute(platform, ctx, suffix, lang) {
         switch (platform) {
             case "discord":
-                this.discord(msg, suffix, lang);
+                this.discord(ctx, suffix, lang);
                 break;
             case "telegram":
-                this.telegram(msg, suffix, lang);
+                this.telegram(ctx, suffix, lang);
                 break;
         }
     }
-    discord(msg, suffix, lang) {
-        msg.reply("Test!");
+    discord(ctx, suffix, lang) {
+        ctx.reply("Test!");
     }
-    telegram(msg, suffix, lang) {
-        msg.reply("Test!");
+    telegram(ctx, suffix, lang) {
+        ctx.reply("Test!");
     }
 }
 exports.default = { DevCommand: new DevCommand(), TestCommand: new TestCommand() };

@@ -8,10 +8,10 @@ for (var group in AllCommands) {
     let command = AllCommands[group][commandKey];
 
     if (hasSupportFor("discord", commandKey)) {
-      DiscordCommands[group][commandKey] = command;
+      DiscordCommands[commandKey] = command;
     }
     if (hasSupportFor("telegram", commandKey)) {
-      TelegramCommands[group][commandKey] = command;
+      TelegramCommands[commandKey] = command;
     }
   }
 }
