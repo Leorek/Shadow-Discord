@@ -8,20 +8,18 @@ class DevCommand {
         this.permissions = ["member"];
         this.platforms = ["discord"];
     }
-    execute(platform, msg) {
-        console.log("Executing " + this.name);
-        console.log("Platform: " + platform);
+    execute(platform, ctx) {
         switch (platform) {
             case "discord":
-                this.discord(msg);
+                this.discord(ctx);
                 break;
         }
     }
-    discord(msg) {
-        var initTime = new Date(msg.timestamp).valueOf();
-        msg.reply("Pong!").then(m => {
+    discord(ctx) {
+        var initTime = new Date(ctx.timestamp).valueOf();
+        ctx.reply("Pong!").then(m => {
             m.edit("<@" +
-                msg.author.id +
+                ctx.author.id +
                 ">, Pong! Time taken: " +
                 Math.floor(new Date(m.timestamp).valueOf() - initTime) +
                 " ms.");
