@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Request = require("request");
+const Request = require("request-promise");
 class SayCommand {
     constructor() {
         this.name = "say";
@@ -48,40 +48,39 @@ class RandomCatCommand {
         }
     }
     discord(ctx, suffix, lang) {
-        Request("http://random.cat/meow", function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                try {
-                    JSON.parse(body);
-                }
-                catch (e) {
-                    ctx.channel.send(lang.__("bad_answer_from_api"));
-                    return;
-                }
-                var cat = JSON.parse(body);
-                ctx.channel.send(cat.file);
-            }
-            else {
-                ctx.channel.send(lang.__("something_went_wrong"));
-            }
+        this.common()
+            .then(res => {
+            ctx.channel.send(res.file);
+        })
+            .catch(err => {
+            ctx.channel.send(lang.__("something_went_wrong"));
         });
     }
     telegram(ctx, suffix, lang) {
-        Request("http://random.cat/meow", function (error, response, body) {
-            if (!error && response.statusCode === 200) {
-                try {
-                    JSON.parse(body);
-                }
-                catch (e) {
-                    ctx.reply("Bad answer from api");
-                    return;
-                }
-                var cat = JSON.parse(body);
-                ctx.replyWithPhoto(cat.file);
+        this.common()
+            .then(res => {
+            const cat = JSON.parse(res);
+            if (this.isGif(cat.file)) {
+                ctx.replyWithDocument(cat.file);
             }
             else {
-                ctx.channel.send("Something went wrong");
+                console.log("Is a photo");
+                console.log(res);
+                console.log("Sending: " + cat.file);
+                ctx.replyWithPhoto(cat.file);
             }
+        })
+            .catch(err => {
+            ctx.reply(lang.__("something_went_wrong"));
         });
+    }
+    common() {
+        return Request("http://random.cat/meow");
+    }
+    isGif(file) {
+        const gifValidator = new RegExp("(.*?).(gif)$");
+        console.log("Is gif: " + gifValidator.test(file));
+        return gifValidator.exec(file);
     }
 }
 exports.default = {
