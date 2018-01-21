@@ -42,6 +42,7 @@
     "ramda": "^0.25.0",
     "require-directory": "^2.1.1",
     "telegraf": "^3.17.3",
+    "tmi.js": "^1.2.1",
     "typescript": "^2.6.2",
     "uws": "^8.14.1",
     "wtf_wikipedia": "^1.0.1",
