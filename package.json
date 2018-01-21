@@ -4,7 +4,7 @@
   "description": "Yet another discord bot.",
   "main": "Shadow.js",
   "scripts": {
-    "start": "npm run build-ts && node dist/server.js",
+    "start": "npm run build-ts && node dist/bot.js",
     "build-ts": "tsc"
   },
   "repository": {
@@ -37,7 +37,9 @@
     "make-dir": "^1.0.0",
     "mongoose": "^4.11.9",
     "node-opus": "^0.2.7",
+    "node-telegram-bot-api": "^0.30.0",
     "nodemw": "^0.10.1",
+    "ramda": "^0.25.0",
     "require-directory": "^2.1.1",
     "telegraf": "^3.17.3",
     "typescript": "^2.6.2",

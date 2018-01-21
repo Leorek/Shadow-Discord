@@ -64,9 +64,6 @@ class RandomCatCommand {
                 ctx.replyWithDocument(cat.file);
             }
             else {
-                console.log("Is a photo");
-                console.log(res);
-                console.log("Sending: " + cat.file);
                 ctx.replyWithPhoto(cat.file);
             }
         })

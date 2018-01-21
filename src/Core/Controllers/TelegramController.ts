@@ -1,28 +1,22 @@
-import * as TelegramBot from "telegraf";
+import * as TelegramBot from "node-telegram-bot-api";
 
-class TelegramController {
-  public bot;
-  private commands;
-  constructor(token, commands) {
-    this.bot = new TelegramBot(token);
-    this.commands = commands;
-    this.bot.start(ctx => {
-      console.log("started:", ctx.from.id);
-      return ctx.reply("Welcome!");
-    });
-    this.registerCommands();
-    this.bot.startPolling();
+export default class TelegramController {
+  private bot;
+  private master;
+
+  constructor(token, master) {
+    this.master = master;
+    this.bot = new TelegramBot(token, { polling: true });
+    this.setUpEvents();
   }
 
-  private registerCommands() {
-    for (let group in this.commands) {
-      console.log("Group: ");
-      console.log(group);
-      this.bot.command(this.commands[group].name, ctx =>
-        this.commands[group].execute("telegram", ctx)
-      );
-    }
+  setUpEvents() {
+    this.bot.on("message", msg => {
+      this.master.onMessage("telegram", this.getContent(msg), msg);
+    });
+  }
+
+  getContent(msg) {
+    return msg.text;
   }
 }
-
-export default TelegramController;
