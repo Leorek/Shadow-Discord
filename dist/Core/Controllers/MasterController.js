@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const Lang = require("i18n");
 const DiscordController_1 = require("./DiscordController");
 const TelegramController_1 = require("./TelegramController");
 const TwitchController_1 = require("./TwitchController");
@@ -12,13 +13,13 @@ class MasterController {
         this.telegramBot = new TelegramController_1.default(config.tokens.telegram, this);
         this.twitchBot = new TwitchController_1.default(config.tokens.twitch, this);
         this.registerCommands();
+        this.configureLanguage();
     }
-    onMessage(platform, content, msg) {
-        console.log("Received message");
+    onMessage(platform, content, context) {
         const command = this.getCommand(content);
-        if (!ramda_1.isEmpty(command.ref)) {
+        if (!ramda_1.isEmpty(command.ref.name)) {
             if (this.userHasPermissions()) {
-                console.log("Executing command: " + command.ref.name);
+                command.ref.execute(command, platform, context, Lang, this);
             }
         }
     }
@@ -50,6 +51,11 @@ class MasterController {
     }
     registerCommands() {
         ramda_1.forEach(category => ramda_1.forEach(command => this.commands.set(Commands_1.default[category][command].name, Commands_1.default[category][command]), ramda_1.keysIn(Commands_1.default[category])), ramda_1.keysIn(Commands_1.default));
+    }
+    configureLanguage() {
+        Lang.configure({
+            directory: "./Locales"
+        });
     }
 }
 exports.default = MasterController;

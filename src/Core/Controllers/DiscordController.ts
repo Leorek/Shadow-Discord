@@ -1,6 +1,7 @@
 import * as DiscordBot from "discord.js";
 
 export default class DiscordController {
+  public platform = "discord";
   private bot;
   private master;
 
@@ -13,7 +14,7 @@ export default class DiscordController {
 
   setupEvents() {
     this.bot.on("message", msg => {
-      this.master.onMessage("discord", this.getContent(msg), msg);
+      this.master.onMessage("discord", this.getContent(msg), this, msg);
     });
   }
 

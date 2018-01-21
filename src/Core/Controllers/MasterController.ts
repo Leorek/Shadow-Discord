@@ -1,3 +1,4 @@
+import * as Lang from "i18n";
 import DiscordController from "./DiscordController";
 import TelegramController from "./TelegramController";
 import TwitchController from "./TwitchController";
@@ -39,15 +40,15 @@ export default class MasterController {
     this.telegramBot = new TelegramController(config.tokens.telegram, this);
     this.twitchBot = new TwitchController(config.tokens.twitch, this);
     this.registerCommands();
+    this.configureLanguage();
   }
 
-  onMessage(platform, content, msg) {
-    console.log("Received message");
+  onMessage(content, controller, context) {
     const command = this.getCommand(content);
 
-    if (!isEmpty(command.ref)) {
+    if (!isEmpty(command.ref.name)) {
       if (this.userHasPermissions()) {
-        console.log("Executing command: " + command.ref.name);
+        command.ref.execute(command, controller, context, Lang, this);
       }
     }
   }
@@ -98,5 +99,11 @@ export default class MasterController {
         ),
       keysIn(AllCommands)
     );
+  }
+
+  private configureLanguage() {
+    Lang.configure({
+      directory: "./Locales"
+    });
   }
 }

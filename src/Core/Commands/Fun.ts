@@ -35,39 +35,40 @@ class RandomCatCommand {
   public permissions = ["member"];
   public platforms = ["discord", "telegram"];
 
-  execute(platform, ctx, suffix, lang) {
+  execute(command, platform, context, lang, master) {
     switch (platform) {
       case "discord":
-        this.discord(ctx, suffix, lang);
+        this.discord(command, context, lang);
         break;
       case "telegram":
-        this.telegram(ctx, suffix, lang);
+        this.telegram(command, context, lang);
         break;
     }
   }
 
-  discord(ctx, suffix, lang) {
+  private discord(command, ctx, lang) {
     this.common()
       .then(res => {
-        ctx.channel.send(res.file);
+        const cat = JSON.parse(res);
+        ctx.channel.send(cat.file);
       })
       .catch(err => {
         ctx.channel.send(lang.__("something_went_wrong"));
       });
   }
 
-  telegram(ctx, suffix, lang) {
+  private telegram(command, context, lang) {
     this.common()
       .then(res => {
         const cat = JSON.parse(res);
         if (this.isGif(cat.file)) {
-          ctx.replyWithDocument(cat.file);
+          context.replyWithDocument(cat.file);
         } else {
-          ctx.replyWithPhoto(cat.file);
+          context.replyWithPhoto(cat.file);
         }
       })
       .catch(err => {
-        ctx.reply(lang.__("something_went_wrong"));
+        context.reply(lang.__("something_went_wrong"));
       });
   }
 
