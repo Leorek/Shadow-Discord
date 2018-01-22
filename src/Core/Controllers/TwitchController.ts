@@ -3,8 +3,9 @@ import * as TwitchBot from "tmi.js";
 export default class TwitchController {
   private bot;
   private master;
+  private lang;
 
-  constructor(config, master) {
+  constructor(config, lang, master) {
     this.master = master;
     this.bot = new TwitchBot.client({
       identity: {
@@ -13,6 +14,7 @@ export default class TwitchController {
       },
       channels: ["#leorek"]
     });
+    this.lang = lang;
     this.bot.connect();
     this.setupEvents();
   }

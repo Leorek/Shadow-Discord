@@ -8,48 +8,15 @@ class RandomCatCommand {
         this.permissions = ["member"];
         this.platforms = ["discord", "telegram"];
     }
-    execute(controller, context, command, lang, master) {
-        switch (controller.platform) {
-            case "discord":
-                this.discord(command, context, lang);
-                break;
-            case "telegram":
-                this.telegram(command, context, lang);
-                break;
-        }
-    }
-    discord(command, ctx, lang) {
-        this.common()
+    execute(controller, context, command) {
+        Request("http://random.cat/meow")
             .then(res => {
             const cat = JSON.parse(res);
-            ctx.channel.send(cat.file);
+            controller.sendImage(context, cat.file);
         })
             .catch(err => {
-            ctx.channel.send(lang.__("something_went_wrong"));
+            controller.sendMessage(context, "something_went_wrong");
         });
-    }
-    telegram(command, context, lang) {
-        this.common()
-            .then(res => {
-            const cat = JSON.parse(res);
-            if (this.isGif(cat.file)) {
-                context.replyWithDocument(cat.file);
-            }
-            else {
-                context.replyWithPhoto(cat.file);
-            }
-        })
-            .catch(err => {
-            context.reply(lang.__("something_went_wrong"));
-        });
-    }
-    common() {
-        return Request("http://random.cat/meow");
-    }
-    isGif(file) {
-        const gifValidator = new RegExp("(.*?).(gif)$");
-        console.log("Is gif: " + gifValidator.test(file));
-        return gifValidator.exec(file);
     }
 }
 exports.default = new RandomCatCommand();

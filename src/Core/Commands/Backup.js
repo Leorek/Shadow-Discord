@@ -88,50 +88,6 @@ Commands.randomdog = {
   }
 };
 
-Commands.yesno = {
-  name: "yesno",
-  help: "Sends a random gif or picture with yes or no",
-  permissions: ["member"],
-  fn: function(msg, suffix, lang) {
-    Request("https://yesno.wtf/api/", function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        try {
-          JSON.parse(body);
-        } catch (e) {
-          msg.channel.send(format(lang.__("bad_answer_from_api")));
-          return;
-        }
-        var yesno = JSON.parse(body);
-        msg.channel.send(yesno.image);
-      } else {
-        msg.channel.send(format(lang.__("something_went_wrong")));
-      }
-    });
-  }
-};
-
-Commands.yomomma = {
-  name: "yomomma",
-  help: "Sends a random joke about ur mum.",
-  permissions: ["member"],
-  fn: function(msg, suffix, lang) {
-    Request("http://api.yomomma.info/", function(error, response, body) {
-      if (!error && response.statusCode === 200) {
-        try {
-          JSON.parse(body);
-        } catch (e) {
-          msg.channel.send(format(lang.__("bad_answer_from_api")));
-          return;
-        }
-        var yomomma = JSON.parse(body);
-        msg.channel.send(yomomma.joke);
-      } else {
-        msg.channel.send(format(lang.__("something_went_wrong")));
-      }
-    });
-  }
-};
-
 function format(info) {
   return {
     embed: {

@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const TwitchBot = require("tmi.js");
 class TwitchController {
-    constructor(config, master) {
+    constructor(config, lang, master) {
         this.master = master;
         this.bot = new TwitchBot.client({
             identity: {
@@ -11,6 +11,7 @@ class TwitchController {
             },
             channels: ["#leorek"]
         });
+        this.lang = lang;
         this.bot.connect();
         this.setupEvents();
     }
