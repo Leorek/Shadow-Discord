@@ -5,7 +5,8 @@ const DiscordController_1 = require("./DiscordController");
 const TelegramController_1 = require("./TelegramController");
 const TwitchController_1 = require("./TwitchController");
 const ramda_1 = require("ramda");
-const Commands_1 = require("../Commands");
+const RD = require("require-directory");
+const AllCommands = RD(module, "../Commands");
 class MasterController {
     constructor(config) {
         this.commands = new Map();
@@ -50,7 +51,15 @@ class MasterController {
         return command;
     }
     registerCommands() {
-        ramda_1.forEach(category => ramda_1.forEach(command => this.commands.set(Commands_1.default[category][command].name, Commands_1.default[category][command]), ramda_1.keysIn(Commands_1.default[category])), ramda_1.keysIn(Commands_1.default));
+        console.log(AllCommands);
+        ramda_1.forEach(category => {
+            console.log(category);
+            ramda_1.forEach(command => {
+                console.log(command);
+                this.commands.set(AllCommands[category][command].default.name, AllCommands[category][command].default);
+            }, ramda_1.keysIn(AllCommands[category]));
+        }, ramda_1.keysIn(AllCommands));
+        console.log(this.commands);
     }
     configureLanguage() {
         Lang.configure({

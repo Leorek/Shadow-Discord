@@ -52,5 +52,5 @@ class RandomCatCommand {
         return gifValidator.exec(file);
     }
 }
-exports.default = RandomCatCommand;
+exports.default = new RandomCatCommand();
 //# sourceMappingURL=RandomCat.js.map

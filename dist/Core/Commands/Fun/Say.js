@@ -29,5 +29,5 @@ class SayCommand {
         ctx.reply("Test!");
     }
 }
-exports.default = SayCommand;
+exports.default = new SayCommand();
 //# sourceMappingURL=Say.js.map

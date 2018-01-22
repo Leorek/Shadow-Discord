@@ -1,6 +1,6 @@
 import * as Request from "request-promise";
 
-export default class RandomCatCommand {
+class RandomCatCommand {
   public name = "randomcat";
   public help = "Sends a random picture or gif of cats.";
   public permissions = ["member"];
@@ -53,3 +53,5 @@ export default class RandomCatCommand {
     return gifValidator.exec(file);
   }
 }
+
+export default new RandomCatCommand();

@@ -1,4 +1,4 @@
-export default class SayCommand {
+class SayCommand {
   public name = "say";
   public help = "Repeats with tts!";
   public permissions = ["member"];
@@ -26,3 +26,4 @@ export default class SayCommand {
     ctx.reply("Test!");
   }
 }
+export default new SayCommand();

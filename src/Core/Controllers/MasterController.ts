@@ -14,19 +14,20 @@ import {
   keysIn,
   forEach
 } from "ramda";
-import AllCommands from "../Commands";
+import * as RD from "require-directory";
+const AllCommands = RD(module, "../Commands");
 
 type Command = {
   name: string;
   help: string;
-  permissions: Array<any>;
-  platforms: Array<any>;
+  permissions: Array<String>;
+  platforms: Array<String>;
   execute: Function;
 };
 
 type CommandRef = {
   ref: Command;
-  params: Array<any>;
+  params: Array<String>;
 };
 
 export default class MasterController {
@@ -86,18 +87,18 @@ export default class MasterController {
   }
 
   private registerCommands() {
-    forEach(
-      category =>
-        forEach(
-          command =>
-            this.commands.set(
-              AllCommands[category][command].name,
-              AllCommands[category][command]
-            ),
-          keysIn(AllCommands[category])
-        ),
-      keysIn(AllCommands)
-    );
+    console.log(AllCommands);
+    forEach(category => {
+      console.log(category);
+      forEach(command => {
+        console.log(command);
+        this.commands.set(
+          AllCommands[category][command].default.name,
+          AllCommands[category][command].default
+        );
+      }, keysIn(AllCommands[category]));
+    }, keysIn(AllCommands));
+    console.log(this.commands);
   }
 
   private configureLanguage() {
