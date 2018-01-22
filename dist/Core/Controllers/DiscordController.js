@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const DiscordBot = require("discord.js");
 class DiscordController {
     constructor(token, master) {
+        this.platform = "discord";
         this.master = master;
         this.bot = new DiscordBot.Client();
         this.bot.login(token);
@@ -10,7 +11,7 @@ class DiscordController {
     }
     setupEvents() {
         this.bot.on("message", msg => {
-            this.master.onMessage("discord", this.getContent(msg), msg);
+            this.master.onMessage(this, msg);
         });
     }
     getContent(msg) {

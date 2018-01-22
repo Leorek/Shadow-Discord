@@ -1,35 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const Request = require("request-promise");
-class SayCommand {
-    constructor() {
-        this.name = "say";
-        this.help = "Repeats with tts!";
-        this.permissions = ["member"];
-        this.platforms = ["discord"];
-    }
-    execute(platform, ctx, suffix, lang) {
-        switch (platform) {
-            case "discord":
-                this.discord(ctx, suffix, lang);
-                break;
-            case "telegram":
-                this.telegram(ctx, suffix, lang);
-                break;
-        }
-    }
-    discord(ctx, suffix, lang) {
-        if (suffix.length <= 0) {
-            ctx.reply("I can't say nothing :3");
-        }
-        else {
-            ctx.channel.send(suffix, { tts: true });
-        }
-    }
-    telegram(ctx, suffix, lang) {
-        ctx.reply("Test!");
-    }
-}
 class RandomCatCommand {
     constructor() {
         this.name = "randomcat";
@@ -37,8 +8,8 @@ class RandomCatCommand {
         this.permissions = ["member"];
         this.platforms = ["discord", "telegram"];
     }
-    execute(command, platform, context, lang, master) {
-        switch (platform) {
+    execute(controller, context, command, lang, master) {
+        switch (controller.platform) {
             case "discord":
                 this.discord(command, context, lang);
                 break;
@@ -50,7 +21,6 @@ class RandomCatCommand {
     discord(command, ctx, lang) {
         this.common()
             .then(res => {
-            console.log(res);
             const cat = JSON.parse(res);
             ctx.channel.send(cat.file);
         })
@@ -82,8 +52,5 @@ class RandomCatCommand {
         return gifValidator.exec(file);
     }
 }
-exports.default = {
-    SayCommand: new SayCommand(),
-    RandomCatCommand: new RandomCatCommand()
-};
-//# sourceMappingURL=Fun.js.map
+exports.default = RandomCatCommand;
+//# sourceMappingURL=RandomCat.js.map

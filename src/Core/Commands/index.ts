@@ -1,4 +1,4 @@
 import Dev from "./Dev";
-import Fun from "./Fun";
+import FunCommands from "./Fun";
 
-export default { Dev, Fun };
+export default { Dev, FunCommands };

@@ -14,11 +14,11 @@ export default class DiscordController {
 
   setupEvents() {
     this.bot.on("message", msg => {
-      this.master.onMessage("discord", this.getContent(msg), this, msg);
+      this.master.onMessage(this, msg);
     });
   }
 
-  getContent(msg) {
+  public getContent(msg) {
     return msg.content;
   }
 }

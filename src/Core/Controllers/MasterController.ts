@@ -43,12 +43,11 @@ export default class MasterController {
     this.configureLanguage();
   }
 
-  onMessage(content, controller, context) {
-    const command = this.getCommand(content);
-
+  onMessage(controller, context) {
+    const command = this.getCommand(controller.getContent(context));
     if (!isEmpty(command.ref.name)) {
       if (this.userHasPermissions()) {
-        command.ref.execute(command, controller, context, Lang, this);
+        command.ref.execute(controller, context, command, Lang, this);
       }
     }
   }

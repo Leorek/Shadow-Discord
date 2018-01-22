@@ -15,11 +15,11 @@ class MasterController {
         this.registerCommands();
         this.configureLanguage();
     }
-    onMessage(platform, content, context) {
-        const command = this.getCommand(content);
+    onMessage(controller, context) {
+        const command = this.getCommand(controller.getContent(context));
         if (!ramda_1.isEmpty(command.ref.name)) {
             if (this.userHasPermissions()) {
-                command.ref.execute(command, platform, context, Lang, this);
+                command.ref.execute(controller, context, command, Lang, this);
             }
         }
     }
