@@ -38,22 +38,20 @@ class Shadow {
   private commands = new Map<String, Command>();
 
   constructor(config) {
-    if (!isNil(config.tokens.discord) && !isEmpty(config.tokens.discord)) {
-      this.discordBot = new DiscordController(
-        config.tokens.discord,
-        Lang,
-        this
-      );
+    if (!isNil(config.discord) && !isEmpty(config.discord)) {
+      this.discordBot = new DiscordController(config.discord, Lang, this);
+    } else {
+      console.log("Discord module is disabled. (Bad configuration?)");
     }
-    if (!isNil(config.tokens.telegram) && !isEmpty(config.tokens.telegram)) {
-      this.telegramBot = new TelegramController(
-        config.tokens.telegram,
-        Lang,
-        this
-      );
+    if (!isNil(config.telegram) && !isEmpty(config.telegram)) {
+      this.telegramBot = new TelegramController(config.telegram, Lang, this);
+    } else {
+      console.log("Telegram module is disabled. (Bad configuration?)");
     }
-    if (!isNil(config.tokens.twitch) && !isEmpty(config.tokens.twitch)) {
-      this.twitchBot = new TwitchController(config.tokens.twitch, Lang, this);
+    if (!isNil(config.twitch) && !isEmpty(config.twitch)) {
+      this.twitchBot = new TwitchController(config.twitch, Lang, this);
+    } else {
+      console.log("Twitch module is disabled. (Bad configuration?)");
     }
 
     this.registerCommands();
@@ -63,7 +61,7 @@ class Shadow {
   onMessage(controller, context) {
     console.log("Received message: ");
     console.log(controller.getContent(context));
-    const command = this.getCommand(controller.getContent(context));
+    const command = this.getCommand(controller, context);
     if (!isEmpty(command.ref.name)) {
       if (this.userHasPermissions()) {
         console.log("Executing command: " + command.ref.name);
@@ -76,7 +74,7 @@ class Shadow {
     return true;
   }
 
-  private getCommand(content) {
+  private getCommand(controller, context) {
     let command: CommandRef = {
       ref: {
         name: "",
@@ -87,13 +85,20 @@ class Shadow {
       },
       params: []
     };
-
-    if (!isNil(content) && !isEmpty(content) && startsWith("!", content)) {
+    const content = controller.getContent(context);
+    if (
+      !isNil(content) &&
+      !isEmpty(content) &&
+      startsWith(controller.prefix, content)
+    ) {
       const commandSplitted = split(" ", content);
 
       if (length(commandSplitted) > 0) {
         const commandName = toLower(
-          takeLast(length(commandSplitted[0]) - length("!"), commandSplitted[0])
+          takeLast(
+            length(commandSplitted[0]) - length(controller.prefix),
+            commandSplitted[0]
+          )
         );
         if (this.commands.has(commandName)) {
           command.ref = this.commands.get(commandName);

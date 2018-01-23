@@ -3,9 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const TelegramBot = require("node-telegram-bot-api");
 const Utils_1 = require("../Utils");
 class TelegramController {
-    constructor(token, lang, master) {
+    constructor(config, lang, master) {
+        this.prefix = "";
         this.master = master;
-        this.bot = new TelegramBot(token, { polling: true });
+        this.prefix = config.prefix;
+        this.bot = new TelegramBot(config.token, { polling: true });
         this.lang = lang;
         this.setUpEvents();
     }
@@ -18,7 +20,6 @@ class TelegramController {
         return msg.text;
     }
     sendMessage(context, message) {
-        // lang.__("something_went_wrong")
         this.bot.sendMessage(context.chat.id, message);
     }
     sendImage(context, image) {

@@ -2,14 +2,16 @@ import * as DiscordBot from "discord.js";
 
 export default class DiscordController {
   public platform = "discord";
+  public prefix = "";
   private bot;
   private master;
   private lang;
 
-  constructor(token, lang, master) {
+  constructor(config, lang, master) {
     this.master = master;
+    this.prefix = config.prefix;
     this.bot = new DiscordBot.Client();
-    this.bot.login(token);
+    this.bot.login(config.token);
     this.lang = lang;
     this.setupEvents();
   }

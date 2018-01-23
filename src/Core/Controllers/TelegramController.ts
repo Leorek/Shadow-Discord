@@ -5,10 +5,12 @@ export default class TelegramController {
   private bot;
   private master;
   private lang;
+  public prefix = "";
 
-  constructor(token, lang, master) {
+  constructor(config, lang, master) {
     this.master = master;
-    this.bot = new TelegramBot(token, { polling: true });
+    this.prefix = config.prefix;
+    this.bot = new TelegramBot(config.token, { polling: true });
     this.lang = lang;
     this.setUpEvents();
   }
@@ -24,7 +26,6 @@ export default class TelegramController {
   }
 
   public sendMessage(context, message) {
-    // lang.__("something_went_wrong")
     this.bot.sendMessage(context.chat.id, message);
   }
 

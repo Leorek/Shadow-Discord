@@ -11,14 +11,23 @@ const AllCommands = RD(module, "./Core/Commands");
 class Shadow {
     constructor(config) {
         this.commands = new Map();
-        if (!ramda_1.isNil(config.tokens.discord) && !ramda_1.isEmpty(config.tokens.discord)) {
-            this.discordBot = new DiscordController_1.default(config.tokens.discord, Lang, this);
+        if (!ramda_1.isNil(config.discord) && !ramda_1.isEmpty(config.discord)) {
+            this.discordBot = new DiscordController_1.default(config.discord, Lang, this);
         }
-        if (!ramda_1.isNil(config.tokens.telegram) && !ramda_1.isEmpty(config.tokens.telegram)) {
-            this.telegramBot = new TelegramController_1.default(config.tokens.telegram, Lang, this);
+        else {
+            console.log("Discord module is disabled. (Bad configuration?)");
+        }
+        if (!ramda_1.isNil(config.telegram) && !ramda_1.isEmpty(config.telegram)) {
+            this.telegramBot = new TelegramController_1.default(config.telegram, Lang, this);
+        }
+        else {
+            console.log("Telegram module is disabled. (Bad configuration?)");
         }
         if (!ramda_1.isNil(config.tokens.twitch) && !ramda_1.isEmpty(config.tokens.twitch)) {
             this.twitchBot = new TwitchController_1.default(config.tokens.twitch, Lang, this);
+        }
+        else {
+            console.log("Twitch module is disabled. (Bad configuration?)");
         }
         this.registerCommands();
         this.configureLanguage();
@@ -26,7 +35,7 @@ class Shadow {
     onMessage(controller, context) {
         console.log("Received message: ");
         console.log(controller.getContent(context));
-        const command = this.getCommand(controller.getContent(context));
+        const command = this.getCommand(controller, context);
         if (!ramda_1.isEmpty(command.ref.name)) {
             if (this.userHasPermissions()) {
                 console.log("Executing command: " + command.ref.name);
@@ -37,7 +46,7 @@ class Shadow {
     userHasPermissions() {
         return true;
     }
-    getCommand(content) {
+    getCommand(controller, context) {
         let command = {
             ref: {
                 name: "",
@@ -48,10 +57,13 @@ class Shadow {
             },
             params: []
         };
-        if (!ramda_1.isNil(content) && !ramda_1.isEmpty(content) && ramda_1.startsWith("!", content)) {
+        const content = controller.getContent(context);
+        if (!ramda_1.isNil(content) &&
+            !ramda_1.isEmpty(content) &&
+            ramda_1.startsWith(controller.prefix, content)) {
             const commandSplitted = ramda_1.split(" ", content);
             if (ramda_1.length(commandSplitted) > 0) {
-                const commandName = ramda_1.toLower(ramda_1.takeLast(ramda_1.length(commandSplitted[0]) - ramda_1.length("!"), commandSplitted[0]));
+                const commandName = ramda_1.toLower(ramda_1.takeLast(ramda_1.length(commandSplitted[0]) - ramda_1.length(controller.prefix), commandSplitted[0]));
                 if (this.commands.has(commandName)) {
                     command.ref = this.commands.get(commandName);
                     command.params = ramda_1.tail(commandSplitted);
