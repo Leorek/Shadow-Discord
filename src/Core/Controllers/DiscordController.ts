@@ -27,7 +27,6 @@ export default class DiscordController {
   }
 
   public sendMessage(context, message) {
-    // lang.__("something_went_wrong")
     context.channel.send(message);
   }
 

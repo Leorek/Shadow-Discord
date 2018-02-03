@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Lang = require("i18n");
 const ramda_1 = require("ramda");
+const UsersManagement_1 = require("./Core/UsersManagement");
 const RD = require("require-directory");
 const DiscordController_1 = require("./Core/Controllers/DiscordController");
 const TelegramController_1 = require("./Core/Controllers/TelegramController");
@@ -23,8 +24,8 @@ class Shadow {
         else {
             console.log("Telegram module is disabled. (Bad configuration?)");
         }
-        if (!ramda_1.isNil(config.tokens.twitch) && !ramda_1.isEmpty(config.tokens.twitch)) {
-            this.twitchBot = new TwitchController_1.default(config.tokens.twitch, Lang, this);
+        if (!ramda_1.isNil(config.twitch) && !ramda_1.isEmpty(config.twitch)) {
+            this.twitchBot = new TwitchController_1.default(config.twitch, Lang, this);
         }
         else {
             console.log("Twitch module is disabled. (Bad configuration?)");
@@ -37,14 +38,16 @@ class Shadow {
         console.log(controller.getContent(context));
         const command = this.getCommand(controller, context);
         if (!ramda_1.isEmpty(command.ref.name)) {
-            if (this.userHasPermissions()) {
-                console.log("Executing command: " + command.ref.name);
-                command.ref.execute(controller, context, command);
-            }
+            UsersManagement_1.userHasPermissions(controller, context, command).then(hasPermissions => {
+                if (hasPermissions) {
+                    console.log("Executing command: " + command.ref.name);
+                    command.ref.execute(controller, context, command);
+                }
+                else {
+                    console.log("This user doesn't have permissions");
+                }
+            });
         }
-    }
-    userHasPermissions() {
-        return true;
     }
     getCommand(controller, context) {
         let command = {

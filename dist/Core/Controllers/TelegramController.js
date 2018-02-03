@@ -4,6 +4,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const Utils_1 = require("../Utils");
 class TelegramController {
     constructor(config, lang, master) {
+        this.platform = "telegram";
         this.prefix = "";
         this.master = master;
         this.prefix = config.prefix;
@@ -18,6 +19,9 @@ class TelegramController {
     }
     getContent(msg) {
         return msg.text;
+    }
+    getUserId(msg) {
+        return msg.from.id;
     }
     sendMessage(context, message) {
         this.bot.sendMessage(context.chat.id, message);

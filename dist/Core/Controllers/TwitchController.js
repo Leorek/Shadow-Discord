@@ -3,11 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const TwitchBot = require("tmi.js");
 class TwitchController {
     constructor(config, lang, master) {
+        this.prefix = "";
         this.master = master;
+        this.prefix = config.prefix;
         this.bot = new TwitchBot.client({
             identity: {
-                username: config.username,
-                password: config.password
+                username: config.credentials.username,
+                password: config.credentials.password
             },
             channels: ["#leorek"]
         });

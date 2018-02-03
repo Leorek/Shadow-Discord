@@ -11,6 +11,7 @@ import {
   keysIn,
   forEach
 } from "ramda";
+import { userHasPermissions } from "./Core/UsersManagement";
 import * as RD from "require-directory";
 import DiscordController from "./Core/Controllers/DiscordController";
 import TelegramController from "./Core/Controllers/TelegramController";
@@ -63,15 +64,18 @@ class Shadow {
     console.log(controller.getContent(context));
     const command = this.getCommand(controller, context);
     if (!isEmpty(command.ref.name)) {
-      if (this.userHasPermissions()) {
-        console.log("Executing command: " + command.ref.name);
-        command.ref.execute(controller, context, command);
-      }
+      userHasPermissions(controller, context, command).then(hasPermissions => {
+        if (hasPermissions) {
+          console.log("Executing command: " + command.ref.name);
+          if (command.ref.name === "help") {
+          } else {
+            command.ref.execute(controller, context, command);
+          }
+        } else {
+          console.log("This user doesn't have permissions");
+        }
+      });
     }
-  }
-
-  private userHasPermissions() {
-    return true;
   }
 
   private getCommand(controller, context) {

@@ -2,6 +2,7 @@ import * as TelegramBot from "node-telegram-bot-api";
 import { isGif } from "../Utils";
 
 export default class TelegramController {
+  public platform = "telegram";
   private bot;
   private master;
   private lang;
@@ -23,6 +24,10 @@ export default class TelegramController {
 
   public getContent(msg) {
     return msg.text;
+  }
+
+  public getUserId(msg) {
+    return msg.from.id;
   }
 
   public sendMessage(context, message) {
