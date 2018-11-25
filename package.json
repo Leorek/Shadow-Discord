@@ -4,8 +4,8 @@
   "description": "Yet another discord bot.",
   "main": "Shadow.js",
   "scripts": {
-    "start": "node Shadow.js",
-    "test": "standard --verbose | snazzy && node Shadow.js"
+    "start": "npm run build-ts && node dist/bot.js",
+    "build-ts": "tsc"
   },
   "repository": {
     "type": "git",
@@ -26,18 +26,26 @@
   },
   "homepage": "https://github.com/Leorek/Shadow-Discord#readme",
   "dependencies": {
+    "@types/node": "^8.5.7",
     "bluebird": "^3.5.0",
     "bunyan": "^1.8.12",
+    "commander": "^2.13.0",
     "discord.js": "^11.1.0",
     "erlpack": "github:hammerandchisel/erlpack",
     "googleapis": "^21.3.0",
     "i18n": "^0.8.3",
+    "inquirer": "^5.0.1",
     "leaguejs": "^1.4.0",
     "make-dir": "^1.0.0",
     "mongoose": "^4.11.9",
     "node-opus": "^0.2.7",
+    "node-telegram-bot-api": "^0.30.0",
     "nodemw": "^0.10.1",
+    "ramda": "^0.25.0",
     "require-directory": "^2.1.1",
+    "telegraf": "^3.17.3",
+    "tmi.js": "^1.2.1",
+    "typescript": "^2.6.2",
     "uws": "^8.14.1",
     "wtf_wikipedia": "^1.0.1",
     "ytdl-core": "^0.17.0"
