@@ -1,6 +1,6 @@
 import * as TwitchBot from "tmi.js";
 
-export default class TwitchController {
+export class TwitchController {
   private bot;
   private master;
   private lang;

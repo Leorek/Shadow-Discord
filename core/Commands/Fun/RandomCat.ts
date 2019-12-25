@@ -6,14 +6,14 @@ class RandomCatCommand {
   public permissions = ["member"];
   public platforms = ["discord", "telegram"];
 
-  public execute(controller, context, command) {
+  public execute(context, command) {
     Request("http://random.cat/meow")
       .then(res => {
         const cat = JSON.parse(res);
-        controller.sendImage(context, cat.file);
+        context.sendImage(cat.file);
       })
       .catch(err => {
-        controller.sendMessage(context, "something_went_wrong");
+        context.sendMessage("something_went_wrong");
       });
   }
 }

@@ -1,0 +1,9 @@
+{
+  "clients": [
+    {
+      "name": "discord",
+      "token": "MjU1NDUwOTc5MDU3NTMyOTI4.XgKvZg.UhgSoAcnCuKWnJ2mDzByS_gxMtA",
+      "defaultPrefix": "!"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 import * as TelegramBot from "node-telegram-bot-api";
 import { isGif } from "../Utils";
 
-export default class TelegramController {
+export class TelegramController {
   public platform = "telegram";
   private bot;
   private master;
