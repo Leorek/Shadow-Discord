@@ -3,13 +3,17 @@ import * as klaw from "klaw"
 export class CommandManager {
   private static instance: CommandManager;
 
-  commands: Map<String, Map<String, Command>> = new Map<String, Map<String, Command>>();
+  commands: Map<String, Map<String, Command>>;
 
   static getInstance() {
     if (!CommandManager.instance) {
       CommandManager.instance = new CommandManager();
     }
     return CommandManager.instance;
+  }
+
+  private constructor(){
+    this.commands = new Map<String, Map<String, Command>>();
   }
 
   // Load all commands
@@ -25,25 +29,34 @@ export class CommandManager {
       if (file.path.endsWith(".js")) {
         console.log("Loading command: ", file.path);
         import(file.path).then(command => {
-          if (command.default.platforms) {
-            for (const platform of command.default.platforms) {
+          if (command.default.Platforms) {
+            console.log("This command has platforms");
+            for (const platform of command.default.Platforms) {
+              console.log("Setting up platform ", platform);
               if (!this.commands.has(platform)) {
                 this.commands.set(platform, new Map<String, Command>());
               }
               const platformCommands = this.commands.get(platform);
               platformCommands.set(command.default.Name, command);
+              
+              console.log("Command loaded: ", command.default.Name);
             }
-            this.commands.set(command.default.Category, command.default);
-            console.log("Command loaded: ", command.default.Name);
           } else {
-            console.log("Command " + command.default.Name + " lacks of Category or platform.");
+            console.log("Command " + command.default.Name + " lacks of Category or platform.",command.default.Platforms);
           }
         })
       }
     }
+    console.log("Check: ", this.commands)
   }
   // Get command
-  public getCommand(platform, name) {
-    console.log("Getting command ", platform, name);
+  public getCommand(platform, commandName) {
+    console.log("CHECK 2 ", CommandManager.getInstance().commands);
+    console.log("Getting command ", platform, commandName);
+    const platformCommands = this.commands.get(platform);
+    console.log("Got this commands for the platform", platform,platformCommands);
+    const command = platformCommands.get(commandName);
+
+    return command;
   }
 }

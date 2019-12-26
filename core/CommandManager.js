@@ -43,18 +43,20 @@ class CommandManager {
                     if (file.path.endsWith(".js")) {
                         console.log("Loading command: ", file.path);
                         Promise.resolve().then(() => require(file.path)).then(command => {
-                            if (command.default.platforms && command.default.Category) {
-                                // for(const platform of command.default.platforms){
-                                //   if(this.commands.has(platform)){
-                                //     const platformCommands = this.commands.get(platform);
-                                //     platformCommands.set(command.default.)
-                                //   }
-                                // }
-                                this.commands.set(command.default.Category, command.default);
-                                console.log("Command loaded: ", command.default.Name);
+                            if (command.default.Platforms) {
+                                console.log("This command has platforms");
+                                for (const platform of command.default.Platforms) {
+                                    console.log("Setting up platform ", platform);
+                                    if (!this.commands.has(platform)) {
+                                        this.commands.set(platform, new Map());
+                                    }
+                                    const platformCommands = this.commands.get(platform);
+                                    platformCommands.set(command.default.Name, command);
+                                    console.log("Command loaded: ", command.default.Name);
+                                }
                             }
                             else {
-                                console.log("Command " + command.default.Name + " lacks of Category or platform.");
+                                console.log("Command " + command.default.Name + " lacks of Category or platform.", command.default.Platforms);
                             }
                         });
                     }
@@ -67,11 +69,17 @@ class CommandManager {
                 }
                 finally { if (e_1) throw e_1.error; }
             }
+            console.log("Check: ", this.commands);
         });
     }
     // Get command
-    getCommand(platform, name) {
-        console.log("Getting command ", platform, name);
+    getCommand(platform, commandName) {
+        console.log("CHECK 2 ", CommandManager.getInstance().commands);
+        console.log("Getting command ", platform, commandName);
+        const platformCommands = this.commands.get(platform);
+        console.log("Got this commands for the platform", platform, platformCommands);
+        const command = platformCommands.get(commandName);
+        return command;
     }
 }
 exports.CommandManager = CommandManager;

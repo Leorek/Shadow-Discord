@@ -16,6 +16,7 @@ class Shadow {
     constructor(config) {
         this.parseConfig(config);
         this.configureLanguage();
+        CommandManager.getInstance().loadCommands();
     }
 
     parseConfig(config) {

@@ -31,7 +31,11 @@ export class TelegramController {
       const params = {};
       // Execute command
       const command: any = CommandManager.getInstance().getCommand(this.platform, name);
-      command.execute(new TelegramContext(this.bot, context), params);
+      if(command){
+        command.execute(new TelegramContext(this.bot, context), params);
+      }else{
+        console.log("The command doesn´t exists",name);
+      }     
     }
   };
 

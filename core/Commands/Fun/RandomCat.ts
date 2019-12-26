@@ -8,6 +8,7 @@ export default class RandomCatCommand {
   public static Platforms = ["discord", "telegram"];
 
   public execute(context, command) {
+    console.log("Executing randomcat command");
     Request("http://random.cat/meow")
       .then(res => {
         const cat = JSON.parse(res);

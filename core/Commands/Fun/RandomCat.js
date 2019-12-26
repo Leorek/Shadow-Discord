@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Request = require("request-promise");
 class RandomCatCommand {
     execute(context, command) {
+        console.log("Executing randomcat command");
         Request("http://random.cat/meow")
             .then(res => {
             const cat = JSON.parse(res);

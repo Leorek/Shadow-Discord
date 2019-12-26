@@ -4,11 +4,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Lang = require("i18n");
 const Controllers_1 = require("./Core/Controllers");
 const config = require("./shadow.config.json");
+const CommandManager_1 = require("./core/CommandManager");
 class Shadow {
     constructor(config) {
         this.controllers = new Array();
         this.parseConfig(config);
         this.configureLanguage();
+        CommandManager_1.CommandManager.getInstance().loadCommands();
     }
     parseConfig(config) {
         console.log("Got this config ", config);
