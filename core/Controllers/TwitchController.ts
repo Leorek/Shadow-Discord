@@ -6,7 +6,7 @@ export class TwitchController {
   private lang;
   public prefix = "";
 
-  constructor(config, lang, master) {
+  constructor(config, master) {
     this.master = master;
     this.prefix = config.prefix;
     this.bot = new TwitchBot.client({
@@ -16,7 +16,6 @@ export class TwitchController {
       },
       channels: ["#leorek"]
     });
-    this.lang = lang;
     this.bot.connect();
     this.setupEvents();
   }

@@ -1,50 +1,58 @@
-import "./types/global";
+// import "./types/global.d";
 import * as Lang from "i18n";
 import {
-  DiscordController,
-  TelegramController,
-  TwitchController
+    DiscordController,
+    TelegramController,
+    TwitchController
 } from "./Core/Controllers";
 
-const config = require("../config.json");
+import * as config from "./shadow.config.json";
+
+import { CommandManager } from "./core/CommandManager"
 
 class Shadow {
-  private controllers = new Array<Controller>();
+    private controllers = new Array<Controller>();
 
-  constructor(config) {
-    this.parseConfig(config);
-    this.configureLanguage();
-  }
-
-  parseConfig(config) {
-    if (config.clients && config.clients > 0) {
-      for (const clientConfig of config.clients) {
-        switch (clientConfig.name) {
-          case "discord":
-            this.controllers.push(
-              new DiscordController(config.discord, Lang, this)
-            );
-            break;
-          case "telegram":
-            this.controllers.push(
-              new TelegramController(config.telegram, Lang, this)
-            );
-            break;
-          case "twitch":
-            this.controllers.push(
-              new TwitchController(config.twitch, Lang, this)
-            );
-            break;
-        }
-      }
+    constructor(config) {
+        this.parseConfig(config);
+        this.configureLanguage();
     }
-  }
 
-  private configureLanguage() {
-    Lang.configure({
-      directory: "./locales"
-    });
-  }
+    parseConfig(config) {
+        console.log("Got this config ", config);
+        if (config.clients && config.clients.length > 0) {
+            console.log("Got enough clients");
+            for (const clientConfig of config.clients) {
+                console.log("Client config: ", clientConfig)
+                switch (clientConfig.name) {
+                    case "discord":
+                        this.controllers.push(
+                            new DiscordController(clientConfig, this)
+                        );
+                        break;
+                    case "telegram":
+                        console.log("Configuring telegram");
+                        this.controllers.push(
+                            new TelegramController(clientConfig)
+                        );
+                        break;
+                    case "twitch":
+                        this.controllers.push(
+                            new TwitchController(clientConfig, this)
+                        );
+                        break;
+                }
+            }
+        }
+    }
+
+    private configureLanguage() {
+        Lang.configure({
+            directory: "./locales"
+        });
+    }
 }
 
 var bot = new Shadow(config);
+
+// CommandManager.getInstance().loadCommands();

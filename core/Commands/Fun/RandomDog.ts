@@ -1,11 +1,13 @@
 import * as Request from "request-promise";
 import { isEmpty, equals, head, join, forEach, contains } from "ramda";
 
-class RandomDogCommand {
-  public name = "randomdog";
-  public help = "Sends a random picture or gif of doggies.";
-  public permissions = ["member"];
-  public platforms = ["discord", "telegram"];
+export default class RandomDogCommand {
+  public static Name = "RandomDog";
+  public static Help = "Sends a random picture or gif of doggies.";
+  public static Category = "Fun";
+  public static Permissions = ["member"];
+  public static Platforms = ["discord", "telegram"];
+
   private apiURL = "https://dog.ceo/api/";
   private breeds = [];
 
@@ -63,5 +65,3 @@ class RandomDogCommand {
       });
   }
 }
-
-export default new RandomDogCommand();

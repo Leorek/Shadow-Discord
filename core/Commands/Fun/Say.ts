@@ -1,8 +1,9 @@
-class SayCommand {
-  public name = "say";
-  public help = "Repeats with tts!";
-  public permissions = ["member"];
-  public platforms = ["discord"];
+export default class SayCommand {
+  public static Name = "say";
+  public static Help = "Repeats with tts!";
+  public static Category = "Fun";
+  public static Permissions = ["member"];
+  public static Platforms = ["discord"];
 
   execute(platform, ctx, suffix, lang) {
     switch (platform) {
@@ -26,4 +27,3 @@ class SayCommand {
     ctx.reply("Test!");
   }
 }
-export default new SayCommand();

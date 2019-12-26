@@ -1,11 +1,12 @@
-import MusicCore from "../../MusicCore";
+// import MusicCore from "../../MusicCore";
 import { isNil, isEmpty } from "ramda";
 
-class PlayCommand {
-  public name = "play";
-  public help = "Searchs a song on youtube and adds it to the queue.";
-  public permissions = ["member"];
-  public platforms = ["discord"];
+export default class PlayCommand {
+  public static Name = "play";
+  public static Help = "Searchs a song on youtube and adds it to the queue.";
+  public static Category = "Music";
+  public static Permissions = ["member"];
+  public static Platforms = ["discord"];
 
   public execute(controller, context, command) {
     if (isNil(context.member.voiceChannel)) {
@@ -15,11 +16,9 @@ class PlayCommand {
       controller.sendMessage(context, "music_nothing_specified");
     }
 
-    if (MusicCore.queueFull(context.guild.id)) {
-      controller.sendMessage(context, "music_max_queue_size_reached");
-    }
+    // if (MusicCore.queueFull(context.guild.id)) {
+    //   controller.sendMessage(context, "music_max_queue_size_reached");
+    // }
     //MusicCore.play();
   }
 }
-
-export default new PlayCommand();

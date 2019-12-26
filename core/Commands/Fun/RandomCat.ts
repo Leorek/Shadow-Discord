@@ -1,10 +1,11 @@
 import * as Request from "request-promise";
 
-class RandomCatCommand {
-  public name = "randomcat";
-  public help = "Sends a random picture or gif of cats.";
-  public permissions = ["member"];
-  public platforms = ["discord", "telegram"];
+export default class RandomCatCommand {
+  public static Name = "RandomDog";
+  public static Help = "Sends a random picture or gif of cats.";
+  public static Category = "Fun"
+  public static Permissions = ["member"];
+  public static Platforms = ["discord", "telegram"];
 
   public execute(context, command) {
     Request("http://random.cat/meow")
@@ -17,5 +18,3 @@ class RandomCatCommand {
       });
   }
 }
-
-export default new RandomCatCommand();

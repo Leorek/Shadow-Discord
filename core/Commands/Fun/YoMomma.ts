@@ -1,10 +1,11 @@
 import * as Request from "request-promise";
 
-class YoMommaCommand {
-  public name = "yomomma";
-  public help = "Sends a random joke about ur mum.";
-  public permissions = ["member"];
-  public platforms = ["discord", "telegram"];
+export default class YoMommaCommand {
+  public static Name = "yomomma";
+  public static Help = "Sends a random joke about ur mum.";
+  public static Category = "Fun";
+  public static Permissions = ["member"];
+  public static Platforms = ["discord", "telegram"];
 
   public execute(controller, context, command) {
     Request("http://api.yomomma.info/")
@@ -17,5 +18,3 @@ class YoMommaCommand {
       });
   }
 }
-
-export default new YoMommaCommand();

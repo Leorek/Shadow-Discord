@@ -1,10 +1,11 @@
 import * as Request from "request-promise";
 
-class YesNoCommand {
-  public name = "yesno";
-  public help = "Sends a random gif or picture with yes or no";
-  public permissions = ["member"];
-  public platforms = ["discord", "telegram"];
+export default class YesNoCommand {
+  public static Name = "yesno";
+  public static Help = "Sends a random gif or picture with yes or no";
+  public static Category = "Fun";
+  public static Permissions = ["member"];
+  public static Platforms = ["discord", "telegram"];
 
   public execute(controller, context, command) {
     Request("https://yesno.wtf/api/")
@@ -17,5 +18,3 @@ class YesNoCommand {
       });
   }
 }
-
-export default new YesNoCommand();

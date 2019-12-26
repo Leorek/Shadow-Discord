@@ -25,7 +25,7 @@ export class DiscordController {
     // Get params of command
     const params = {};
     // Execute command
-    const command: any = CommandManager.getCommand(this.platform, name);
+    const command: any = CommandManager.getInstance().getCommand(this.platform, name);
     command.execute(new DiscordContext(context), params);
   };
 }

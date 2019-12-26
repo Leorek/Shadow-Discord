@@ -4,10 +4,11 @@
 
 type Controller = {};
 type Command = {
-  name: string;
-  help: string;
-  permissions: Array<String>;
-  platforms: Array<String>;
+  Name: string;
+  Help: string;
+  Category: string;
+  Permissions: Array<String>;
+  Platforms: Array<String>;
   execute: Function;
 };
 
@@ -15,3 +16,8 @@ type CommandRef = {
   ref: Command;
   params: Array<String>;
 };
+
+type CommandManager = {
+  loadCommands: Function;
+  getCommand: Function;
+}
