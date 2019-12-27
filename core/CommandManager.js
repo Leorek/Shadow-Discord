@@ -8,6 +8,33 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __asyncValues = (this && this.__asyncValues) || function (o) {
     if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
     var m = o[Symbol.asyncIterator], i;
@@ -16,71 +43,81 @@ var __asyncValues = (this && this.__asyncValues) || function (o) {
     function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const klaw = require("klaw");
-class CommandManager {
-    constructor() {
+var klaw = require("klaw");
+var CommandManager = /** @class */ (function () {
+    function CommandManager(platform) {
+        var _this = this;
         this.commands = new Map();
-    }
-    static getInstance() {
-        if (!CommandManager.instance) {
-            CommandManager.instance = new CommandManager();
-        }
-        return CommandManager.instance;
-    }
-    // Load all commands
-    loadCommands() {
-        var e_1, _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            const options = {
-                filter: (filePath) => {
-                    return !filePath.endsWith(".ts") && !filePath.endsWith(".map");
-                }
-            };
-            console.log("Let´s start to load commands");
-            try {
-                for (var _b = __asyncValues(klaw(__dirname + '/Commands', options)), _c; _c = yield _b.next(), !_c.done;) {
-                    const file = _c.value;
-                    if (file.path.endsWith(".js")) {
-                        console.log("Loading command: ", file.path);
-                        Promise.resolve().then(() => require(file.path)).then(command => {
-                            if (command.default.Platforms) {
-                                console.log("This command has platforms");
-                                for (const platform of command.default.Platforms) {
-                                    console.log("Setting up platform ", platform);
-                                    if (!this.commands.has(platform)) {
-                                        this.commands.set(platform, new Map());
+        // Load all commands
+        this.loadCommands = function () { return __awaiter(_this, void 0, void 0, function () {
+            var options, _a, _b, file, e_1_1;
+            var _this = this;
+            var e_1, _c;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        options = {
+                            filter: function (filePath) {
+                                return !filePath.endsWith(".ts") && !filePath.endsWith(".map");
+                            }
+                        };
+                        _d.label = 1;
+                    case 1:
+                        _d.trys.push([1, 6, 7, 12]);
+                        _a = __asyncValues(klaw(__dirname + '/Commands', options));
+                        _d.label = 2;
+                    case 2: return [4 /*yield*/, _a.next()];
+                    case 3:
+                        if (!(_b = _d.sent(), !_b.done)) return [3 /*break*/, 5];
+                        file = _b.value;
+                        if (file.path.endsWith(".js")) {
+                            Promise.resolve().then(function () { return require(file.path); }).then(function (command) {
+                                if (command.default.Platforms) {
+                                    for (var _i = 0, _a = command.default.Platforms; _i < _a.length; _i++) {
+                                        var platform = _a[_i];
+                                        if (!_this.commands.has(platform)) {
+                                            _this.commands.set(platform, new Map());
+                                        }
+                                        var platformCommands = _this.commands.get(platform);
+                                        platformCommands.set(command.default.Name.toLowerCase(), command.default);
                                     }
-                                    const platformCommands = this.commands.get(platform);
-                                    platformCommands.set(command.default.Name, command);
-                                    console.log("Command loaded: ", command.default.Name);
                                 }
-                            }
-                            else {
-                                console.log("Command " + command.default.Name + " lacks of Category or platform.", command.default.Platforms);
-                            }
-                        });
-                    }
+                                else {
+                                    console.log("Command " + command.default.Name + " lacks of Category or platform.", command.default.Platforms);
+                                }
+                            });
+                        }
+                        _d.label = 4;
+                    case 4: return [3 /*break*/, 2];
+                    case 5: return [3 /*break*/, 12];
+                    case 6:
+                        e_1_1 = _d.sent();
+                        e_1 = { error: e_1_1 };
+                        return [3 /*break*/, 12];
+                    case 7:
+                        _d.trys.push([7, , 10, 11]);
+                        if (!(_b && !_b.done && (_c = _a.return))) return [3 /*break*/, 9];
+                        return [4 /*yield*/, _c.call(_a)];
+                    case 8:
+                        _d.sent();
+                        _d.label = 9;
+                    case 9: return [3 /*break*/, 11];
+                    case 10:
+                        if (e_1) throw e_1.error;
+                        return [7 /*endfinally*/];
+                    case 11: return [7 /*endfinally*/];
+                    case 12: return [2 /*return*/];
                 }
-            }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
-            finally {
-                try {
-                    if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-                }
-                finally { if (e_1) throw e_1.error; }
-            }
-            console.log("Check: ", this.commands);
-        });
+            });
+        }); };
+        // Get command
+        this.getCommand = function (platform, commandName) {
+            var platformCommands = _this.commands.get(platform);
+            var command = platformCommands.get(commandName.toLowerCase());
+            return command;
+        };
+        this.platform = platform;
     }
-    // Get command
-    getCommand(platform, commandName) {
-        console.log("CHECK 2 ", CommandManager.getInstance().commands);
-        console.log("Getting command ", platform, commandName);
-        const platformCommands = this.commands.get(platform);
-        console.log("Got this commands for the platform", platform, platformCommands);
-        const command = platformCommands.get(commandName);
-        return command;
-    }
-}
+    return CommandManager;
+}());
 exports.CommandManager = CommandManager;
-//# sourceMappingURL=CommandManager.js.map

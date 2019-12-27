@@ -68,4 +68,3 @@
 // }
 // exports.Commands = Commands
 // exports.Category = 'Moderation'
-//# sourceMappingURL=Moderation.js.map

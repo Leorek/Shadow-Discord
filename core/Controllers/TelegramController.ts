@@ -3,12 +3,15 @@ import { CommandManager } from "../CommandManager";
 import { isGif } from "../Utils";
 
 export class TelegramController {
-  public platform = "telegram";
+  private platform = "telegram";
   private bot;
+  private commands: CommandManager;
   public prefix = "";
 
   constructor(config) {
     this.prefix = config.defaultPrefix;
+    this.commands = new CommandManager(this.platform);
+    this.commands.loadCommands();
     this.bot = new TelegramBot(config.token, { polling: true });
     this.setUpEvents();
   }
@@ -21,7 +24,6 @@ export class TelegramController {
   }
 
   private onMessage = context => {
-    console.log("Received new message", context);
     const text = context.text;
 
     if (text.startsWith(this.prefix)) {
@@ -30,16 +32,19 @@ export class TelegramController {
       // Get params of command
       const params = {};
       // Execute command
-      const command: any = CommandManager.getInstance().getCommand(this.platform, name);
-      if(command){
-        command.execute(new TelegramContext(this.bot, context), params);
-      }else{
-        console.log("The command doesn´t exists",name);
-      }     
+      const command: any = this.commands.getCommand(this.platform, name);
+
+      console.log("Got this command from the function: ", command);
+      if (command) {       
+        const commandContext = new TelegramContext(this.bot, context);
+        const res = command.execute(commandContext, params);
+      } else {
+        console.log("The command doesn´t exists", name);
+      }
     }
   };
 
-  private getCommandName(text){
+  private getCommandName(text) {
     const textSplit = text.split(" ");
     return textSplit[0].substr(1); // In order to remove the prefix
   }

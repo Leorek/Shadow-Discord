@@ -1,10 +1,16 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es5",
     "module": "commonjs",
-    "sourceMap": true,
+    "moduleResolution": "Node",
     "resolveJsonModule": true
   },
-  "include": ["core/**/*.ts","types/global.d.ts", "index.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "core/**/*.ts",
+    "types/global.d.ts",
+    "index.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

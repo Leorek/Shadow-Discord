@@ -1,43 +1,46 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const DiscordBot = require("discord.js");
-const CommandManager_1 = require("../CommandManager");
-class DiscordController {
-    constructor(config, shared) {
+var DiscordBot = require("discord.js");
+var CommandManager_1 = require("../CommandManager");
+var DiscordController = /** @class */ (function () {
+    function DiscordController(config, shared) {
+        var _this = this;
         this.platform = "discord";
         this.prefix = "";
-        this.onMessage = context => {
+        this.onMessage = function (context) {
             // Check which command is
-            const name = "";
+            var name = "";
             // Get params of command
-            const params = {};
+            var params = {};
             // Execute command
-            const command = CommandManager_1.CommandManager.getInstance().getCommand(this.platform, name);
+            var command = _this.commands.getCommand(_this.platform, name);
             command.execute(new DiscordContext(context), params);
         };
         this.shared = shared;
         this.prefix = config.prefix;
+        this.commands = new CommandManager_1.CommandManager(this.platform);
         this.bot = new DiscordBot.Client();
         this.bot.login(config.token);
         this.setupEvents();
     }
-    setupEvents() {
+    DiscordController.prototype.setupEvents = function () {
         this.bot.on("message", this.onMessage);
-    }
-}
+    };
+    return DiscordController;
+}());
 exports.DiscordController = DiscordController;
-class DiscordContext {
-    constructor(context) {
+var DiscordContext = /** @class */ (function () {
+    function DiscordContext(context) {
         this.context = context;
     }
-    getContent() {
+    DiscordContext.prototype.getContent = function () {
         return this.context.content;
-    }
-    sendMessage(message) {
+    };
+    DiscordContext.prototype.sendMessage = function (message) {
         this.context.channel.send(message);
-    }
-    sendImage(image) {
+    };
+    DiscordContext.prototype.sendImage = function (image) {
         this.context.channel.send(image);
-    }
-}
-//# sourceMappingURL=DiscordController.js.map
+    };
+    return DiscordContext;
+}());

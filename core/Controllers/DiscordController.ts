@@ -1,15 +1,17 @@
 import * as DiscordBot from "discord.js";
-import { CommandManager } from "../CommandManager";
+import {CommandManager} from "../CommandManager";
 
 export class DiscordController {
   public platform = "discord";
   public prefix = "";
   private bot;
+  private commands;
   private shared;
 
   constructor(config, shared) {
     this.shared = shared;
     this.prefix = config.prefix;
+    this.commands = new CommandManager(this.platform);
     this.bot = new DiscordBot.Client();
     this.bot.login(config.token);
     this.setupEvents();
@@ -25,7 +27,7 @@ export class DiscordController {
     // Get params of command
     const params = {};
     // Execute command
-    const command: any = CommandManager.getInstance().getCommand(this.platform, name);
+    const command: any = this.commands.getCommand(this.platform, name);
     command.execute(new DiscordContext(context), params);
   };
 }

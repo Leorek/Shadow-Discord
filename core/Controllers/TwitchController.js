@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const TwitchBot = require("tmi.js");
-class TwitchController {
-    constructor(config, master) {
+var TwitchBot = require("tmi.js");
+var TwitchController = /** @class */ (function () {
+    function TwitchController(config, master) {
         this.prefix = "";
         this.master = master;
         this.prefix = config.prefix;
@@ -16,16 +16,17 @@ class TwitchController {
         this.bot.connect();
         this.setupEvents();
     }
-    setupEvents() {
-        this.bot.on("message", (channel, userstate, message, self) => {
+    TwitchController.prototype.setupEvents = function () {
+        var _this = this;
+        this.bot.on("message", function (channel, userstate, message, self) {
             if (self)
                 return;
-            this.master.onMessage("twitch", message);
+            _this.master.onMessage("twitch", message);
         });
-    }
-    getContent(msg) {
+    };
+    TwitchController.prototype.getContent = function (msg) {
         return msg.content;
-    }
-}
+    };
+    return TwitchController;
+}());
 exports.TwitchController = TwitchController;
-//# sourceMappingURL=TwitchController.js.map

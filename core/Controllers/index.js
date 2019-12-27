@@ -6,4 +6,3 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./DiscordController"));
 __export(require("./TelegramController"));
 __export(require("./TwitchController"));
-//# sourceMappingURL=index.js.map

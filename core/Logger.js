@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const Fs = require("fs");
-const MakeDir = require("make-dir");
+var Fs = require("fs");
+var MakeDir = require("make-dir");
 if (!Fs.existsSync("./Logs/")) {
     MakeDir.sync("./Logs/");
 }
@@ -36,4 +36,3 @@ var Logger = Bunyan.createLogger({
     ]
 });
 exports.default = Logger;
-//# sourceMappingURL=Logger.js.map

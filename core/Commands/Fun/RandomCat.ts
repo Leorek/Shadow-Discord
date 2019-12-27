@@ -1,15 +1,15 @@
 import * as Request from "request-promise";
 
-export default class RandomCatCommand {
-  public static Name = "RandomDog";
-  public static Help = "Sends a random picture or gif of cats.";
-  public static Category = "Fun"
-  public static Permissions = ["member"];
-  public static Platforms = ["discord", "telegram"];
+export default new class RandomCatCommand {
+  public Name = "RandomCat";
+  public Help = "Sends a random picture or gif of cats.";
+  public Category = "Fun"
+  public Permissions = ["member"];
+  public Platforms = ["discord", "telegram"];
 
-  public execute(context, command) {
+  execute = (context, params) => {
     console.log("Executing randomcat command");
-    Request("http://random.cat/meow")
+    Request("http://aws.random.cat/meow")
       .then(res => {
         const cat = JSON.parse(res);
         context.sendImage(cat.file);
@@ -17,5 +17,7 @@ export default class RandomCatCommand {
       .catch(err => {
         context.sendMessage("something_went_wrong");
       });
+
+      return "hola";
   }
 }

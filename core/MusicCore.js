@@ -21,4 +21,3 @@
 //   }
 // }
 // export default new MusicCore();
-//# sourceMappingURL=MusicCore.js.map

@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-class DiscordHelpCommand {
-    execute(context, command) {
+var DiscordHelpCommand = /** @class */ (function () {
+    function DiscordHelpCommand() {
+    }
+    DiscordHelpCommand.prototype.execute = function (context, command) {
         // if (!suffix) {
         //   msg.author
         //     .createDM()
@@ -106,12 +108,12 @@ class DiscordHelpCommand {
         //     msg.channel.send(`There is no **${suffix}** command!`);
         //   }
         // }
-    }
-}
+    };
+    DiscordHelpCommand.Name = "help";
+    DiscordHelpCommand.Help = "Sends help.";
+    DiscordHelpCommand.Category = "Help";
+    DiscordHelpCommand.Permissions = ["member"];
+    DiscordHelpCommand.Platforms = ["discord"];
+    return DiscordHelpCommand;
+}());
 exports.default = DiscordHelpCommand;
-DiscordHelpCommand.Name = "help";
-DiscordHelpCommand.Help = "Sends help.";
-DiscordHelpCommand.Category = "Help";
-DiscordHelpCommand.Permissions = ["member"];
-DiscordHelpCommand.Platforms = ["discord"];
-//# sourceMappingURL=DiscordHelper.js.map
