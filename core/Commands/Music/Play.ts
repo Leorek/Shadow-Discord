@@ -1,19 +1,19 @@
 // import MusicCore from "../../MusicCore";
-import { isNil, isEmpty } from "ramda";
+import { isEmpty } from "ramda";
 
-export default class PlayCommand {
-  public static Name = "play";
-  public static Help = "Searchs a song on youtube and adds it to the queue.";
-  public static Category = "Music";
-  public static Permissions = ["member"];
-  public static Platforms = ["discord"];
+export default new (class PlayCommand {
+  public Name = "play";
+  public Help = "Searchs a song on youtube and adds it to the queue.";
+  public Category = "Music";
+  public Permissions = ["member"];
+  public Platforms = ["discord"];
 
-  public execute(controller, context, command) {
-    if (isNil(context.member.voiceChannel)) {
-      controller.sendMessage(context, "Not in voice channel");
+  public execute(context, params) {
+    if (context.getVoiceChannel()) {
+      context.sendMessage(context, "Not in voice channel");
     }
     if (isEmpty(command.params)) {
-      controller.sendMessage(context, "music_nothing_specified");
+      context.sendMessage(context, "music_nothing_specified");
     }
 
     // if (MusicCore.queueFull(context.guild.id)) {
@@ -21,4 +21,4 @@ export default class PlayCommand {
     // }
     //MusicCore.play();
   }
-}
+})();

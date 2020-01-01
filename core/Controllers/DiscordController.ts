@@ -47,6 +47,10 @@ class DiscordContext {
     this.context = context;
   }
 
+  public getVoiceChannel() {
+    return this.context.member.voiceChannel;
+  }
+
   public getContent() {
     return this.context.content;
   }
