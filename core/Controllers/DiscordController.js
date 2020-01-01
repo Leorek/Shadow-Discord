@@ -43,8 +43,13 @@ var DiscordContext = /** @class */ (function () {
     DiscordContext.prototype.getContent = function () {
         return this.context.content;
     };
-    DiscordContext.prototype.sendMessage = function (message) {
-        this.context.channel.send(message);
+    DiscordContext.prototype.sendMessage = function (message, tts) {
+        if (tts) {
+            this.context.channel.send(message, { tts: true });
+        }
+        else {
+            this.context.channel.send(message);
+        }
     };
     DiscordContext.prototype.sendImage = function (image) {
         this.context.channel.send(image);

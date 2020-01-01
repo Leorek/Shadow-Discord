@@ -1,29 +1,16 @@
-export default class SayCommand {
-  public static Name = "say";
-  public static Help = "Repeats with tts!";
-  public static Category = "Fun";
-  public static Permissions = ["member"];
-  public static Platforms = ["discord"];
+export default new (class SayCommand {
+  public Name = "Say";
+  public Help = "Repeats what you say!";
+  public Category = "Fun";
+  public Permissions = ["member"];
+  public Platforms = ["discord", "telegram"];
 
-  execute(platform, ctx, suffix, lang) {
-    switch (platform) {
-      case "discord":
-        this.discord(ctx, suffix, lang);
-        break;
-      case "telegram":
-        this.telegram(ctx, suffix, lang);
-        break;
-    }
-  }
-
-  discord(ctx, suffix, lang) {
-    if (suffix.length <= 0) {
-      ctx.reply("I can't say nothing :3");
+  execute(context, params) {
+    if (params.length > 0) {
+      const message = params.join(" ");
+      context.sendMessage(message, true);
     } else {
-      ctx.channel.send(suffix, { tts: true });
+      context.sendMessage("I can't say nothing :3", true);
     }
   }
-  telegram(ctx, suffix, lang) {
-    ctx.reply("Test!");
-  }
-}
+})();

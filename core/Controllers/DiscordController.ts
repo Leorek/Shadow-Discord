@@ -51,8 +51,12 @@ class DiscordContext {
     return this.context.content;
   }
 
-  public sendMessage(message) {
-    this.context.channel.send(message);
+  public sendMessage(message, tts) {
+    if (tts) {
+      this.context.channel.send(message, { tts: true });
+    } else {
+      this.context.channel.send(message);
+    }
   }
 
   public sendImage(image) {

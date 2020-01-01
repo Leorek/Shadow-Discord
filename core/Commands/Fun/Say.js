@@ -1,34 +1,21 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var SayCommand = /** @class */ (function () {
+exports.default = new (/** @class */ (function () {
     function SayCommand() {
+        this.Name = "Say";
+        this.Help = "Repeats what you say!";
+        this.Category = "Fun";
+        this.Permissions = ["member"];
+        this.Platforms = ["discord", "telegram"];
     }
-    SayCommand.prototype.execute = function (platform, ctx, suffix, lang) {
-        switch (platform) {
-            case "discord":
-                this.discord(ctx, suffix, lang);
-                break;
-            case "telegram":
-                this.telegram(ctx, suffix, lang);
-                break;
-        }
-    };
-    SayCommand.prototype.discord = function (ctx, suffix, lang) {
-        if (suffix.length <= 0) {
-            ctx.reply("I can't say nothing :3");
+    SayCommand.prototype.execute = function (context, params) {
+        if (params.length > 0) {
+            var message = params.join(" ");
+            context.sendMessage(message, true);
         }
         else {
-            ctx.channel.send(suffix, { tts: true });
+            context.sendMessage("I can't say nothing :3", true);
         }
     };
-    SayCommand.prototype.telegram = function (ctx, suffix, lang) {
-        ctx.reply("Test!");
-    };
-    SayCommand.Name = "say";
-    SayCommand.Help = "Repeats with tts!";
-    SayCommand.Category = "Fun";
-    SayCommand.Permissions = ["member"];
-    SayCommand.Platforms = ["discord"];
     return SayCommand;
-}());
-exports.default = SayCommand;
+}()))();
