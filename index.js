@@ -10,7 +10,7 @@ if (config.clients && config.clients.length > 0) {
         var clientConfig = _a[_i];
         switch (clientConfig.name) {
             case "discord":
-                controllers.push(new Controllers_1.DiscordController(clientConfig, this));
+                controllers.push(new Controllers_1.DiscordController(clientConfig));
                 break;
             case "telegram":
                 controllers.push(new Controllers_1.TelegramController(clientConfig));

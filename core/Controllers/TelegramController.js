@@ -16,7 +16,6 @@ var TelegramController = /** @class */ (function () {
                 var name_1 = textSplit[0].substr(1); // In order to remove the prefix
                 // Get params of command
                 var params = textSplit.length > 1 ? textSplit.slice(1) : [];
-                console.log("Got this name and params", name_1, params);
                 // Execute command
                 var command = _this.commands.getCommand(_this.platform, name_1);
                 if (command) {

@@ -3,22 +3,29 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var DiscordBot = require("discord.js");
 var CommandManager_1 = require("../CommandManager");
 var DiscordController = /** @class */ (function () {
-    function DiscordController(config, shared) {
+    function DiscordController(config) {
         var _this = this;
         this.platform = "discord";
         this.prefix = "";
         this.onMessage = function (context) {
-            // Check which command is
-            var name = "";
-            // Get params of command
-            var params = {};
-            // Execute command
-            var command = _this.commands.getCommand(_this.platform, name);
-            command.execute(new DiscordContext(context), params);
+            var text = context.content;
+            if (text.startsWith(_this.prefix)) {
+                var textSplit = text.split(" ");
+                // Check which command is
+                var name_1 = textSplit[0].substr(1); // In order to remove the prefix
+                // Get params of command
+                var params = textSplit.length > 1 ? textSplit.slice(1) : [];
+                // Execute command
+                var command = _this.commands.getCommand(_this.platform, name_1);
+                if (command) {
+                    var commandContext = new DiscordContext(context);
+                    command.execute(commandContext, params);
+                }
+            }
         };
-        this.shared = shared;
-        this.prefix = config.prefix;
+        this.prefix = config.defaultPrefix;
         this.commands = new CommandManager_1.CommandManager(this.platform);
+        this.commands.loadCommands();
         this.bot = new DiscordBot.Client();
         this.bot.login(config.token);
         this.setupEvents();

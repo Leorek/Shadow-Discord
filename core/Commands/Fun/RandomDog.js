@@ -26,7 +26,6 @@ exports.default = new (/** @class */ (function () {
         }
     };
     RandomDogCommand.prototype.fetchRandomDog = function (context) {
-        console.log("Fetch random dog");
         this.request("breeds/image/random")
             .then(function (res) {
             var dog = JSON.parse(res.body);

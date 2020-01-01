@@ -1,6 +1,11 @@
 {
   "clients": [
     {
+      "name": "discord",
+      "token": "MjU1NDUwOTc5MDU3NTMyOTI4.Xgy-Tg.vqcLYp5zYPVcwUpq1HcyEsLwKS8",
+      "defaultPrefix": "!"
+    },
+    {
       "name": "telegram",
       "token": "393214262:AAGydy9itV4AFlLcsMGVnwb2ej9lk4bZyW0",
       "defaultPrefix": "/"
