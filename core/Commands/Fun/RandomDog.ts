@@ -1,67 +1,59 @@
-import * as Request from "request-promise";
-import { isEmpty, equals, head, join, forEach, contains } from "ramda";
+import Got from "got";
 
-export default class RandomDogCommand {
-  public static Name = "RandomDog";
-  public static Help = "Sends a random picture or gif of doggies.";
-  public static Category = "Fun";
-  public static Permissions = ["member"];
-  public static Platforms = ["discord", "telegram"];
+export default new (class RandomDogCommand {
+  public Name = "RandomDog";
+  public Help = "Sends a random picture or gif of doggies.";
+  public Category = "Fun";
+  public Permissions = ["member"];
+  public Platforms = ["discord", "telegram"];
 
-  private apiURL = "https://dog.ceo/api/";
-  private breeds = [];
+  private request = Got.extend({
+    prefixUrl: "https://dog.ceo/api/"
+  });
 
-  constructor() {
-    this.fetchBreeds();
-  }
-
-  public execute(controller, context, command) {
-    if (!isEmpty(command.params)) {
-      if (equals(head(command.params), "list")) {
-        Request(this.apiURL + "breeds/list")
-          .then(res => {
-            const dog = JSON.parse(res);
-            this.breeds = dog.message;
-            controller.sendMessage(context, join(",", this.breeds));
-          })
-          .catch(err => {
-            controller.sendMessage(context, "something_went_wrong");
-          });
+  public execute(context, params) {
+    if (params.length > 0) {
+      if ("list" === params[0]) {
+        this.fetchBreedsList(context);
       } else {
-        forEach(breed => {
-          if (contains(breed, this.breeds)) {
-            Request(this.apiURL + "breed/" + breed + "/images/random")
-              .then(res => {
-                const dog = JSON.parse(res);
-                controller.sendImage(context, dog.message);
-              })
-              .catch(err => {
-                controller.sendMessage(context, "something_went_wrong");
-              });
-          }
-        }, command.params);
+        this.fetchRandomDogByBreed(context, params[0]);
       }
     } else {
-      Request(this.apiURL + "breeds/image/random")
-        .then(res => {
-          const dog = JSON.parse(res);
-          controller.sendImage(context, dog.message);
-        })
-        .catch(err => {
-          console.log(err);
-          controller.sendMessage(context, "something_went_wrong");
-        });
+      this.fetchRandomDog(context);
     }
   }
 
-  private fetchBreeds() {
-    Request(this.apiURL + "breeds/list")
+  private fetchRandomDog(context) {
+    this.request("breeds/image/random")
       .then(res => {
-        const dog = JSON.parse(res);
-        this.breeds = dog.message;
+        const dog = JSON.parse(res.body);
+        context.sendImage(dog.message);
       })
       .catch(err => {
-        console.log(err);
+        context.sendMessage("something_went_wrong");
       });
   }
-}
+
+  private fetchBreedsList(context) {
+    this.request("breeds/list")
+      .then(res => {
+        const dog = JSON.parse(res.body);
+        const breeds = dog.message;
+        context.sendMessage(breeds.join(","));
+      })
+      .catch(err => {
+        context.sendMessage("something_went_wrong");
+      });
+  }
+
+  private fetchRandomDogByBreed(context, breed) {
+    this.request(`breed/${breed}/images/random`)
+      .then(res => {
+        const dog = JSON.parse(res.body);
+        context.sendImage(dog.message);
+      })
+      .catch(err => {
+        context.sendMessage("something_went_wrong");
+      });
+  }
+})();

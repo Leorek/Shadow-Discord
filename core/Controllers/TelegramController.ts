@@ -20,34 +20,27 @@ export class TelegramController {
     this.bot.on("text", this.onMessage);
     this.bot.on("error", error => {
       console.log("I had an error", error);
-    })
+    });
   }
 
   private onMessage = context => {
     const text = context.text;
 
     if (text.startsWith(this.prefix)) {
+      const textSplit = text.split(" ");
       // Check which command is
-      const name = this.getCommandName(text);
+      const name = textSplit[0].substr(1); // In order to remove the prefix
       // Get params of command
-      const params = {};
+      const params = textSplit.length > 1 ? textSplit.slice(1) : [];
       // Execute command
       const command: any = this.commands.getCommand(this.platform, name);
 
-      console.log("Got this command from the function: ", command);
-      if (command) {       
+      if (command) {
         const commandContext = new TelegramContext(this.bot, context);
-        const res = command.execute(commandContext, params);
-      } else {
-        console.log("The command doesn´t exists", name);
+        command.execute(commandContext, params);
       }
     }
   };
-
-  private getCommandName(text) {
-    const textSplit = text.split(" ");
-    return textSplit[0].substr(1); // In order to remove the prefix
-  }
 }
 
 class TelegramContext {

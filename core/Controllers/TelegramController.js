@@ -11,19 +11,17 @@ var TelegramController = /** @class */ (function () {
         this.onMessage = function (context) {
             var text = context.text;
             if (text.startsWith(_this.prefix)) {
+                var textSplit = text.split(" ");
                 // Check which command is
-                var name_1 = _this.getCommandName(text);
+                var name_1 = textSplit[0].substr(1); // In order to remove the prefix
                 // Get params of command
-                var params = {};
+                var params = textSplit.length > 1 ? textSplit.slice(1) : [];
+                console.log("Got this name and params", name_1, params);
                 // Execute command
                 var command = _this.commands.getCommand(_this.platform, name_1);
-                console.log("Got this command from the function: ", command);
                 if (command) {
                     var commandContext = new TelegramContext(_this.bot, context);
-                    var res = command.execute(commandContext, params);
-                }
-                else {
-                    console.log("The command doesn´t exists", name_1);
+                    command.execute(commandContext, params);
                 }
             }
         };
@@ -38,10 +36,6 @@ var TelegramController = /** @class */ (function () {
         this.bot.on("error", function (error) {
             console.log("I had an error", error);
         });
-    };
-    TelegramController.prototype.getCommandName = function (text) {
-        var textSplit = text.split(" ");
-        return textSplit[0].substr(1); // In order to remove the prefix
     };
     return TelegramController;
 }());
