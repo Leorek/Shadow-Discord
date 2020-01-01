@@ -1,20 +1,20 @@
-import * as Request from "request-promise";
+import Got from "got";
 
-export default class YoMommaCommand {
-  public static Name = "yomomma";
-  public static Help = "Sends a random joke about ur mum.";
-  public static Category = "Fun";
-  public static Permissions = ["member"];
-  public static Platforms = ["discord", "telegram"];
+export default new (class YoMommaCommand {
+  public Name = "yomomma";
+  public Help = "Sends a random joke about ur mum.";
+  public Category = "Fun";
+  public Permissions = ["member"];
+  public Platforms = ["discord", "telegram"];
 
-  public execute(controller, context, command) {
-    Request("http://api.yomomma.info/")
+  public execute(context, params) {
+    Got("http://api.yomomma.info/")
       .then(res => {
-        var yomomma = JSON.parse(res);
-        controller.sendMessage(context, yomomma.joke);
+        var yomomma = JSON.parse(res.body);
+        context.sendMessage(yomomma.joke);
       })
       .catch(err => {
-        controller.sendMessage(context, "something_went_wrong");
+        context.sendMessage("something_went_wrong");
       });
   }
-}
+})();

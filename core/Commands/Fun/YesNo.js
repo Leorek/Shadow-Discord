@@ -1,24 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Request = require("request-promise");
-var YesNoCommand = /** @class */ (function () {
+var got_1 = require("got");
+exports.default = new (/** @class */ (function () {
     function YesNoCommand() {
+        this.Name = "yesno";
+        this.Help = "Sends a random gif or picture with yes or no";
+        this.Category = "Fun";
+        this.Permissions = ["member"];
+        this.Platforms = ["discord", "telegram"];
     }
-    YesNoCommand.prototype.execute = function (controller, context, command) {
-        Request("https://yesno.wtf/api/")
+    YesNoCommand.prototype.execute = function (context, params) {
+        got_1.default("https://yesno.wtf/api/")
             .then(function (res) {
-            var yesno = JSON.parse(res);
-            controller.sendImage(context, yesno.image);
+            var yesno = JSON.parse(res.body);
+            context.sendImage(yesno.image);
         })
             .catch(function (err) {
-            controller.sendMessage(context, "something_went_wrong");
+            context.sendMessage("something_went_wrong");
         });
     };
-    YesNoCommand.Name = "yesno";
-    YesNoCommand.Help = "Sends a random gif or picture with yes or no";
-    YesNoCommand.Category = "Fun";
-    YesNoCommand.Permissions = ["member"];
-    YesNoCommand.Platforms = ["discord", "telegram"];
     return YesNoCommand;
-}());
-exports.default = YesNoCommand;
+}()))();
